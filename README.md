@@ -2,7 +2,9 @@
 
 "Spyur" is an information company that is collecting, processing and disseminating information about companies and organizations of Armenia.
 
-The app is a materialized version of the [orinal Spyur app].
+The app is a materialized version of the [original Spyur app]. The service has not API whatsoever, so the data fetching is being done via parsing html (therefore, speed suffers).
+
+As long as I cannot own the content being shown in the app, I am not allowed to post it in Google Play. Anyways, you can install the app by downloading Spyur.apk from root directory.
 
 <img src="artwork/demo.gif" width="400" align="right" hspace="20">
 
