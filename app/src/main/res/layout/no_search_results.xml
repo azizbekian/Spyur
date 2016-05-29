@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/no_search_results"
+    style="@style/Widget.Spyur.EmptyText"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:drawablePadding="@dimen/spacing_tiny"
+    android:drawableTop="@drawable/ic_search"
+    android:padding="@dimen/spacing_huge"
+    android:paddingTop="@dimen/spacing_huge"
+    android:textAlignment="center"
+    />

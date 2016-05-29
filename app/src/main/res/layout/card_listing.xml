@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:id="@+id/card_listing_layout"
+              style="@style/CardContent.Listing"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical"
+              android:visibility="gone"
+              tools:showIn="@layout/activity_listing"
+    >
+
+    <TextView
+        android:id="@+id/executives"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/Text.Title"
+        />
+
+    <LinearLayout
+        android:id="@+id/executives_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/spacing_small"
+        android:layout_marginTop="@dimen/spacing_tiny"
+        android:orientation="vertical"
+        />
+
+    <TextView
+        android:id="@+id/contact_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_tiny"
+        android:text="@string/address_telephone"
+        android:textAppearance="@style/Text.Title"
+        />
+
+    <LinearLayout
+        android:id="@+id/contact_info_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/spacing_small"
+        android:layout_marginTop="@dimen/spacing_tiny"
+        android:orientation="vertical"
+        />
+
+    <TextView
+        android:id="@+id/website"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_tiny"
+        android:text="@string/website"
+        android:textAppearance="@style/Text.Title"
+        />
+
+    <LinearLayout
+        android:id="@+id/website_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/spacing_small"
+        android:layout_marginTop="@dimen/spacing_tiny"
+        android:orientation="vertical"
+        />
+
+    <TextView
+        android:id="@+id/listing_in_spyur"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_tiny"
+        android:text="@string/listing_in_spyur"
+        android:textAppearance="@style/Text.Title"
+        />
+
+    <TextView
+        android:id="@+id/listing_in_spyur_url"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/spacing_small"
+        android:layout_marginTop="@dimen/spacing_tiny"
+        android:autoLink="web"
+        android:text="@string/listing_in_spyur"
+        android:textAppearance="@style/Text"
+        />
+
+</LinearLayout>

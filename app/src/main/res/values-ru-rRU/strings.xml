@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="contact_information">Контактные данные</string>
+    <string name="executive">Руководитель</string>
+    <string name="address_telephone">Адрес, телефон</string>
+    <string name="working_days">Рабочие дни, часы</string>
+    <string name="website">Веб-сайт</string>
+    <string name="listing_in_spyur">Страница на www.spyur.am</string>
+    <string name="hint.search">Поиск компаний, ислуг…</string>
+    <string name="message.no_internet">Нет интернета</string>
+
+    <string name="weekday_mon">Пн</string>
+    <string name="weekday_tue">Вт</string>
+    <string name="weekday_wed">Ср</string>
+    <string name="weekday_thu">Чт</string>
+    <string name="weekday_fri">Пт</string>
+    <string name="weekday_sat">Сб</string>
+    <string name="weekday_sun">Вс</string>
+
+    <plurals name="executive">
+        <item quantity="zero">Нет данных</item>
+        <item quantity="few">Руководители</item>
+        <item quantity="many">Руководители</item>
+        <item quantity="one">Руководитель</item>
+        <item quantity="other">Руководители</item>
+    </plurals>
+
+</resources>

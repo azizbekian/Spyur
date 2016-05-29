@@ -1,0 +1,57 @@
+<resources>
+
+    <!-- typical spacing between two views -->
+    <dimen name="spacing_huge">48dp</dimen>
+    <dimen name="spacing_bigger">36dp</dimen>
+    <dimen name="spacing_big">30dp</dimen>
+    <dimen name="spacing_larger">24dp</dimen>
+    <dimen name="spacing_large">20dp</dimen>
+    <dimen name="spacing_normal">16dp</dimen>
+    <dimen name="spacing_small">12dp</dimen>
+    <dimen name="spacing_smaller">8dp</dimen>
+    <dimen name="spacing_tiny">4dp</dimen>
+
+    <!-- font sizes -->
+    <dimen name="font_huge">24sp</dimen>
+    <dimen name="font_bigger">22sp</dimen>
+    <dimen name="font_big">20sp</dimen>
+    <dimen name="font_larger">18sp</dimen>
+    <dimen name="font_large">16sp</dimen>
+    <dimen name="font_normal">14sp</dimen>
+    <dimen name="font_small">12sp</dimen>
+    <dimen name="font_smaller">10sp</dimen>
+    <dimen name="font_tiny">8sp</dimen>
+
+    <dimen name="logo_width_normal">125dp</dimen>
+    <dimen name="logo_height_normal">125dp</dimen>
+    <dimen name="logo_width_small">100dp</dimen>
+    <dimen name="logo_height_small">100dp</dimen>
+    <dimen name="logo_width_tiny">20dp</dimen>
+    <dimen name="logo_height_tiny">20dp</dimen>
+    <dimen name="logo_map_width">40dp</dimen>
+    <dimen name="logo_map_height">40dp</dimen>
+    <dimen name="logo_map_margin_top">37dp</dimen>
+
+    <dimen name="card_padding">16dp</dimen>
+    <dimen name="card_height">60dp</dimen>
+    <dimen name="card_secondary_menu_height">50dp</dimen>
+    <dimen name="card_margin">2dp</dimen>
+    <dimen name="card_corner_radius">2dp</dimen>
+
+    <dimen name="images_slider_height">200dp</dimen>
+    <dimen name="card_placeholder_height">200dp</dimen>
+    <dimen name="listing_header_height">200dp</dimen>
+    <dimen name="listing_header_margin">42dp</dimen>
+    <dimen name="listing_padding_bottom">60dp</dimen>
+    <dimen name="divider_height">1px</dimen>
+
+    <dimen name="z_app_bar">4dp</dimen>
+    <dimen name="z_card">4dp</dimen>
+    <dimen name="z_touch_raise">6dp</dimen>
+
+    <dimen name="ctl_expand_start">48dp</dimen>
+    <dimen name="ctl_expand_end">64dp</dimen>
+
+    <dimen name="ripple_radius_normal">40dp</dimen>
+
+</resources>
