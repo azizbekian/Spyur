@@ -36,7 +36,7 @@ The project is licenced under under GPL-2.0.
    [Dagger 2]: <http://google.github.io/dagger>
    [RetroLambda]: <https://github.com/evant/gradle-retrolambda>
    [Spyur]: <http://spyur.am/>
-   [orinal Spyur app]: <https://play.google.com/store/apps/details?id=com.vavianlabs.spyur>
+   [original Spyur app]: <https://play.google.com/store/apps/details?id=com.vavianlabs.spyur>
    
    
    
