@@ -24,7 +24,7 @@ The app uses following open source projects:
 
 The logo and trademark are property of [Spyur], I do not own any copyrights.
 
-The project is licenced under under GPL-2.0.
+The project is licenced under GPL-2.0.
 
    [Butterknife]: <http://jakewharton.github.io/butterknife/>
    [RxJava]: <https://github.com/ReactiveX/RxJava>
