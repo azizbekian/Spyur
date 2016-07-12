@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <transitionSet xmlns:android="http://schemas.android.com/apk/res/android"
-               android:duration="300"
-               android:interpolator="@android:interpolator/accelerate_quint">
+    android:duration="300"
+    android:interpolator="@android:interpolator/accelerate_quint">
 
-    <changeBounds/>
-    <changeTransform/>
-    <changeClipBounds/>
-    <changeImageTransform/>
-    <autoTransition/>
+    <changeBounds />
+    <changeTransform />
+    <changeClipBounds />
+    <changeImageTransform />
+    <autoTransition />
     <arcMotion
         android:maximumAngle="90"
         android:minimumHorizontalAngle="25"
-        android:minimumVerticalAngle="0"/>
+        android:minimumVerticalAngle="0" />
 
 </transitionSet>

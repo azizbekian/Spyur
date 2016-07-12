@@ -7,7 +7,7 @@ import com.azizbekian.spyur.injection.AppModule;
 import com.azizbekian.spyur.injection.DaggerAppComponent;
 
 /**
- * Created by CargoMatrix, Inc. on May 02, 2016.
+ * Created on May 09, 2016.
  *
  * @author Andranik Azizbekian (andranik.azizbekyan@gmail.com)
  */
@@ -24,7 +24,7 @@ public class SpyurApplication extends Application {
                 .build();
     }
 
-    public static AppComponent getAppComponent() {
+    public static AppComponent getComponent() {
         return sAppComponent;
     }
 

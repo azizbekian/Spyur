@@ -12,6 +12,7 @@ import com.azizbekian.spyur.R;
  * @author Andranik Azizbekian (andranik.azizbekyan@gmail.com)
  */
 public enum WeekDayEnum {
+
     MON(R.string.weekday_mon),
     TUE(R.string.weekday_tue),
     WED(R.string.weekday_wed),
@@ -34,4 +35,5 @@ public enum WeekDayEnum {
         }
         return null;
     }
+
 }

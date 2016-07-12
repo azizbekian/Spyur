@@ -2,6 +2,7 @@ package com.azizbekian.spyur.injection;
 
 import android.content.Context;
 
+import com.azizbekian.spyur.api.ApiInteractor;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
 
@@ -24,7 +25,6 @@ import retrofit2.Retrofit;
  *
  * @author Andranik Azizbekian (andranik.azizbekyan@gmail.com)
  */
-
 @Module
 public class AppModule {
 
@@ -34,14 +34,12 @@ public class AppModule {
         this.context = context;
     }
 
-    @Provides
-    @Singleton
+    @Provides @Singleton
     public Context provideContext() {
         return context;
     }
 
-    @Provides
-    @Singleton
+    @Provides @Singleton
     public OkHttpClient provideOkHttpClient() {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
 
@@ -58,8 +56,7 @@ public class AppModule {
         return builder.build();
     }
 
-    @Provides
-    @Singleton
+    @Provides @Singleton
     public SpyurApi.SearchApi provideSearchApi(OkHttpClient client) {
 
         return new Retrofit.Builder()
@@ -70,8 +67,7 @@ public class AppModule {
                 .create(SpyurApi.SearchApi.class);
     }
 
-    @Provides
-    @Singleton
+    @Provides @Singleton
     public SpyurApi.ListingApi provideListingApi(OkHttpClient client) {
 
         return new Retrofit.Builder()
@@ -82,15 +78,14 @@ public class AppModule {
                 .create(SpyurApi.ListingApi.class);
     }
 
-    @Provides
-    @Singleton
-    public SpyurManager provideSpyurManager(SpyurApi.SearchApi searchApi, SpyurApi.ListingApi
+    @Provides @Singleton
+    public ApiInteractor provideSpyurManager(SpyurApi.SearchApi searchApi, SpyurApi.ListingApi
             listingApi) {
+
         return new SpyurManager(searchApi, listingApi);
     }
 
-    @Provides
-    @Singleton
+    @Provides @Singleton
     public RequestManager provideGlide(Context context) {
         return Glide.with(context);
     }

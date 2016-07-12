@@ -7,7 +7,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Created by CargoMatrix, Inc. on May 04, 2016.
+ * Created on May 09, 2016.
  *
  * @author Andranik Azizbekian (andranik.azizbekyan@gmail.com)
  */

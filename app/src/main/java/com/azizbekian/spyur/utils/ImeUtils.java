@@ -16,6 +16,7 @@ import java.lang.reflect.Method;
 public class ImeUtils {
 
     private ImeUtils() {
+        throw new RuntimeException("Unable to instantiate class " + getClass().getCanonicalName());
     }
 
     /**

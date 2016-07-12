@@ -7,13 +7,15 @@ import android.support.v7.widget.RecyclerView;
 import com.azizbekian.spyur.listener.IRecyclerLoadingListener;
 
 /**
- * A scroll listener for RecyclerView to load more items as you approach the end.
+ * A scroll listener for {@link RecyclerView} to load more items as you approach the end.
  * <p>
- * Adapted from https://gist.github.com/ssinss/e06f12ef66c51252563e
+ * Adapted from <a href="https://gist.github.com/ssinss/e06f12ef66c51252563e">WoongBi Kim</a>
  */
 public abstract class InfiniteScrollListener extends RecyclerView.OnScrollListener {
 
-    // The minimum number of items remaining before some action should be performed.
+    /**
+     * The minimum number of items remaining before some action should be performed.
+     */
     private static final int VISIBLE_THRESHOLD = 5;
 
     private final LinearLayoutManager layoutManager;
@@ -23,6 +25,7 @@ public abstract class InfiniteScrollListener extends RecyclerView.OnScrollListen
     public InfiniteScrollListener(@NonNull LinearLayoutManager layoutManager,
                                   @NonNull IRecyclerLoadingListener isLoading,
                                   int visibleThreshold) {
+
         this.layoutManager = layoutManager;
         this.isLoading = isLoading;
         this.visibleThreshold = visibleThreshold;
@@ -31,6 +34,7 @@ public abstract class InfiniteScrollListener extends RecyclerView.OnScrollListen
     @SuppressWarnings("unused")
     public InfiniteScrollListener(@NonNull LinearLayoutManager layoutManager,
                                   @NonNull IRecyclerLoadingListener isLoading) {
+
         this(layoutManager, isLoading, VISIBLE_THRESHOLD);
     }
 
@@ -48,6 +52,10 @@ public abstract class InfiniteScrollListener extends RecyclerView.OnScrollListen
         }
     }
 
+    /**
+     * Is called, when the {@code threshold} has been passed, meaning that a new data should be
+     * loaded.
+     */
     public abstract void onLoadMore();
 
 }

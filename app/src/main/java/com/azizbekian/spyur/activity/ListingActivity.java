@@ -41,9 +41,9 @@ import android.widget.Toast;
 
 import com.azizbekian.spyur.R;
 import com.azizbekian.spyur.SpyurApplication;
+import com.azizbekian.spyur.api.ApiInteractor;
 import com.azizbekian.spyur.listener.AppBarStateChangeListener;
 import com.azizbekian.spyur.listener.AppBarStateChangeListener.AppBarState;
-import com.azizbekian.spyur.manager.SpyurManager;
 import com.azizbekian.spyur.misc.Constants;
 import com.azizbekian.spyur.model.ListingResponse;
 import com.azizbekian.spyur.model.SearchResponse.SearchItem;
@@ -69,8 +69,8 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import butterknife.Bind;
 import butterknife.BindColor;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import retrofit2.Call;
@@ -81,7 +81,7 @@ import static android.view.View.MeasureSpec.makeMeasureSpec;
 import static com.azizbekian.spyur.listener.AppBarStateChangeListener.EXPANDED;
 
 /**
- * Created by CargoMatrix, Inc. on May 02, 2016.
+ * Created on May 09, 2016.
  *
  * @author Andranik Azizbekian (andranik.azizbekyan@gmail.com)
  */
@@ -122,39 +122,39 @@ public class ListingActivity extends AppCompatActivity
         ActivityCompat.startActivity(activity, intent, sceneTransitionAnimation.toBundle());
     }
 
-    @Bind(R.id.collapsing_toolbar) CollapsingToolbarLayout collapsingToolbarLayout;
-    @Bind(R.id.scroll) NestedScrollView nestedScrollView;
-    @Bind(R.id.toolbar) Toolbar toolbar;
-    @Bind(R.id.back) ImageButton back;
-    @Bind(R.id.app_bar_layout) AppBarLayout appBarLayout;
-    @Bind(R.id.logo_card_view) CardView logoCard;
-    @Bind(R.id.logo_background) ImageView logo;
-    @Bind(R.id.listing_header_background) ImageView logoBackground;
-    @Bind(R.id.header_frame) FrameLayout headerLayout;
-    @Bind(R.id.listing_content_progress_frame) FrameLayout progressBarLayout;
-    @Bind(R.id.listing_content_progress) ProgressBar progressBar;
-    @Bind(R.id.logo_map) ImageView mapLogo;
-    @Bind(R.id.title_header) TextView titleTextView;
+    @BindView(R.id.collapsing_toolbar) CollapsingToolbarLayout collapsingToolbarLayout;
+    @BindView(R.id.scroll) NestedScrollView nestedScrollView;
+    @BindView(R.id.toolbar) Toolbar toolbar;
+    @BindView(R.id.back) ImageButton back;
+    @BindView(R.id.app_bar_layout) AppBarLayout appBarLayout;
+    @BindView(R.id.logo_card_view) CardView logoCard;
+    @BindView(R.id.logo_background) ImageView logo;
+    @BindView(R.id.listing_header_background) ImageView logoBackground;
+    @BindView(R.id.header_frame) FrameLayout headerLayout;
+    @BindView(R.id.listing_content_progress_frame) FrameLayout progressBarLayout;
+    @BindView(R.id.listing_content_progress) ProgressBar progressBar;
+    @BindView(R.id.logo_map) ImageView mapLogo;
+    @BindView(R.id.title_header) TextView titleTextView;
 
     // Content
-    @Bind(R.id.listing_cards) LinearLayout cardRoot;
-    @Bind(R.id.executives) TextView executivesTextView;
-    @Bind(R.id.executives_container) LinearLayout executivesContainer;
-    @Bind(R.id.card_listing_layout) LinearLayout cardListingLayout;
-    @Bind(R.id.contact_info) TextView contactInfoTextView;
-    @Bind(R.id.contact_info_container) LinearLayout contactInfoContainer;
-    @Bind(R.id.website) TextView websiteTextView;
-    @Bind(R.id.website_container) LinearLayout websitesContainer;
-    @Bind(R.id.listing_in_spyur) TextView listingInSpyurTextView;
-    @Bind(R.id.listing_in_spyur_url) TextView listingInSpyurUrlTextView;
-    @Bind(R.id.viewstub_images_slider) ViewStub imagesViewStub;
-    @Bind(R.id.viewstub_youtube) ViewStub videoViewStub;
-    @Bind(R.id.viewstub_empty_listing) ViewStub emptyListingViewStub;
+    @BindView(R.id.listing_cards) LinearLayout cardRoot;
+    @BindView(R.id.executives) TextView executivesTextView;
+    @BindView(R.id.executives_container) LinearLayout executivesContainer;
+    @BindView(R.id.card_listing_layout) LinearLayout cardListingLayout;
+    @BindView(R.id.contact_info) TextView contactInfoTextView;
+    @BindView(R.id.contact_info_container) LinearLayout contactInfoContainer;
+    @BindView(R.id.website) TextView websiteTextView;
+    @BindView(R.id.website_container) LinearLayout websitesContainer;
+    @BindView(R.id.listing_in_spyur) TextView listingInSpyurTextView;
+    @BindView(R.id.listing_in_spyur_url) TextView listingInSpyurUrlTextView;
+    @BindView(R.id.viewstub_images_slider) ViewStub imagesViewStub;
+    @BindView(R.id.viewstub_youtube) ViewStub videoViewStub;
+    @BindView(R.id.viewstub_empty_listing) ViewStub emptyListingViewStub;
 
     @BindColor(R.color.colorPrimary) int colorPrimary;
     @BindColor(R.color.colorPrimaryDark) int colorPrimaryDark;
     @BindColor(android.R.color.transparent) int transparentColor;
-    @Inject SpyurManager spyurManager;
+    @Inject ApiInteractor apiInteractor;
     @Inject RequestManager glide;
 
     private SliderLayout mSliderLayout;
@@ -220,7 +220,7 @@ public class ListingActivity extends AppCompatActivity
         setContentView(R.layout.activity_listing);
         ButterKnife.bind(this);
 
-        SpyurApplication.getAppComponent().inject(this);
+        SpyurApplication.getComponent().inject(this);
 
         supportPostponeEnterTransition();
         // Using setEnterSharedElementCallback, which is being called for return transition too.
@@ -264,19 +264,19 @@ public class ListingActivity extends AppCompatActivity
         glide
                 .load(mSearchItem.getLogo())
                 .asBitmap()
-//                .skipMemoryCache(true)
-//                .dontAnimate()
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                 .priority(Priority.IMMEDIATE)
                 .listener(new RequestListener<String, Bitmap>() {
                     @Override
-                    public boolean onException(Exception e, String model, Target<Bitmap> target, boolean isFirstResource) {
+                    public boolean onException(Exception e, String model, Target<Bitmap> target,
+                                               boolean isFirstResource) {
                         supportStartPostponedEnterTransition();
                         return false;
                     }
 
                     @Override
-                    public boolean onResourceReady(Bitmap resource, String model, Target<Bitmap> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                    public boolean onResourceReady(Bitmap resource, String model, Target<Bitmap> target,
+                                                   boolean isFromMemoryCache, boolean isFirstResource) {
                         Palette.from(resource)
                                 .generate(palette -> {
                                     applyPalette(palette);
@@ -291,7 +291,7 @@ public class ListingActivity extends AppCompatActivity
     private void retrieveData(String href) {
         if (NetworkUtils.isNetworkAvailable(this) && null == mCall) {
             showProgressBar(true);
-            mCall = spyurManager.getListing(href);
+            mCall = apiInteractor.getListing(href);
             mCall.enqueue(new Callback<ListingResponse>() {
                 @Override
                 public void onResponse(Call<ListingResponse> call, Response<ListingResponse> response) {
@@ -382,7 +382,8 @@ public class ListingActivity extends AppCompatActivity
      */
     private void showProgressBar(boolean show) {
         if (show) {
-            progressBar.getIndeterminateDrawable().setColorFilter(mPaletteVibrant, android.graphics.PorterDuff.Mode.SRC_ATOP);
+            progressBar.getIndeterminateDrawable().setColorFilter(mPaletteVibrant,
+                    android.graphics.PorterDuff.Mode.SRC_ATOP);
             progressBarLayout.setVisibility(View.VISIBLE);
         } else progressBarLayout.setVisibility(View.GONE);
     }

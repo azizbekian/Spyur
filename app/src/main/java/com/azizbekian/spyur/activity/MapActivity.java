@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresPermission;
 import android.support.v7.app.AppCompatActivity;
 
+import com.azizbekian.spyur.activity.base.BaseActivity;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -35,7 +36,7 @@ import com.azizbekian.spyur.utils.PermissionUtils;
  *
  * @author Andranik Azizbekian (andranik.azizbekyan@gmail.com)
  */
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback,
+public class MapActivity extends BaseActivity implements OnMapReadyCallback,
         GoogleMap.OnMyLocationChangeListener {
 
     private static final String KEY_COORDINATES = "key_coordinates";
@@ -84,14 +85,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         Intent intent = getIntent();
 
-        if (intent.hasExtra(KEY_COORDINATES)) {
+        if (checkInput(KEY_COORDINATES)) {
             List<ListingResponse.ContactInfo> contactInfoList = intent
                     .getParcelableArrayListExtra(KEY_COORDINATES);
             mCoordinatesList = new ArrayList<>(contactInfoList.size());
             for (ListingResponse.ContactInfo c : contactInfoList) {
                 if (c.loc != null) mCoordinatesList.add(c.loc);
             }
-        } else if (intent.hasExtra(KEY_SINGLE_COORDINATE)) {
+        } else if (checkInput(KEY_SINGLE_COORDINATE)) {
             mCoordinatesList = new ArrayList<>(1);
             Parcelable p = intent.getExtras().getParcelable(KEY_SINGLE_COORDINATE);
             if (p instanceof LatLng) {
@@ -129,6 +130,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
+
         if (requestCode != LOCATION_PERMISSION_REQUEST_CODE) return;
 
         if (PermissionUtils.isPermissionGranted(permissions, grantResults,
@@ -140,6 +142,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @Override
     protected void onResume() {
         super.onResume();
+
         if (mPermissionDenied) {
             // Permission was not granted, display error dialog.
             showMissingPermissionError();

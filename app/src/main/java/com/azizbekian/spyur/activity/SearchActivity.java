@@ -25,24 +25,22 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.jakewharton.rxbinding.widget.RxSearchView;
-
-import java.util.List;
-
 import com.azizbekian.spyur.R;
 import com.azizbekian.spyur.SpyurApplication;
 import com.azizbekian.spyur.adapter.SearchAdapter;
+import com.azizbekian.spyur.api.ApiInteractor;
 import com.azizbekian.spyur.listener.IRecyclerLoadingListener;
-import com.azizbekian.spyur.listener.ISearchItemClicked;
-import com.azizbekian.spyur.manager.SpyurManager;
 import com.azizbekian.spyur.misc.InfiniteScrollListener;
 import com.azizbekian.spyur.misc.NpaLinearLayoutManager;
 import com.azizbekian.spyur.model.SearchResponse;
 import com.azizbekian.spyur.rest.SpyurApi;
 import com.azizbekian.spyur.utils.ImeUtils;
 import com.azizbekian.spyur.utils.NetworkUtils;
+import com.jakewharton.rxbinding.widget.RxSearchView;
 
-import butterknife.Bind;
+import java.util.List;
+
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -53,8 +51,7 @@ import retrofit2.Response;
  *
  * @author Andranik Azizbekian (andranik.azizbekyan@gmail.com)
  */
-public class SearchActivity extends AppCompatActivity implements IRecyclerLoadingListener,
-        ISearchItemClicked {
+public class SearchActivity extends AppCompatActivity implements IRecyclerLoadingListener {
 
     private static final int IME_OPTIONS = EditorInfo.IME_ACTION_SEARCH |
             EditorInfo.IME_FLAG_NO_EXTRACT_UI |
@@ -65,20 +62,16 @@ public class SearchActivity extends AppCompatActivity implements IRecyclerLoadin
      */
     private static final int LOAD_MORE_THRESHOLD_COUNT = 10;
 
-    @Bind(R.id.container) ViewGroup mContainer;
-    @Bind(R.id.scrim) View mScrim;
-    @Bind(R.id.search_toolbar) ViewGroup mSearchToolbar;
-    @Bind(R.id.search_background) View mSearchBackground;
-    @Bind(R.id.search_view) SearchView mSearchView;
-    @Bind(R.id.results_container) ViewGroup mResultsContainer;
-    @Bind(android.R.id.empty) ProgressBar mProgress;
-    @Bind(R.id.stub_no_search_results) ViewStub mNoSearchResultViewStub;
-    @Bind(R.id.search_recycler) RecyclerView mResults;
+    @BindView(R.id.container) ViewGroup mContainer;
+    @BindView(R.id.search_view) SearchView mSearchView;
+    @BindView(android.R.id.empty) ProgressBar mProgress;
+    @BindView(R.id.stub_no_search_results) ViewStub mNoSearchResultViewStub;
+    @BindView(R.id.search_recycler) RecyclerView mResults;
 
     private TextView mNoResults;
     private LinearLayoutManager mLayoutManager;
 
-    private SpyurManager mManager;
+    private ApiInteractor mApiInteractor;
     private SearchAdapter mAdapter;
     private Call<SearchResponse> mCall;
 
@@ -99,9 +92,10 @@ public class SearchActivity extends AppCompatActivity implements IRecyclerLoadin
         setTheme(R.style.Spyur_Search);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
+
         ButterKnife.bind(this);
 
-        mManager = SpyurApplication.getAppComponent().getSpyurManager();
+        mApiInteractor = SpyurApplication.getComponent().getApiInteractor();
         mAutoTransition = TransitionInflater.from(this).inflateTransition(R.transition.auto);
         mNoInternetToast = Toast.makeText(SearchActivity.this, R.string.message_no_internet, Toast.LENGTH_SHORT);
 
@@ -124,6 +118,7 @@ public class SearchActivity extends AppCompatActivity implements IRecyclerLoadin
     @Override
     protected void onStop() {
         super.onStop();
+
         cancelCall();
     }
 
@@ -138,7 +133,11 @@ public class SearchActivity extends AppCompatActivity implements IRecyclerLoadin
     }
 
     private void setupRecyclerView() {
-        mAdapter = new SearchAdapter(this, this);
+        mAdapter = new SearchAdapter(this, (logo, searchItem, position) -> {
+            ImeUtils.hideIme(mSearchView);
+            mSearchView.clearFocus();
+            ListingActivity.launch(SearchActivity.this, logo, searchItem, isItemFullyVisible(position));
+        });
         mLayoutManager = new NpaLinearLayoutManager(this);
         mResults.setHasFixedSize(true);
         mResults.setLayoutManager(mLayoutManager);
@@ -166,7 +165,7 @@ public class SearchActivity extends AppCompatActivity implements IRecyclerLoadin
 
         RxSearchView
                 .queryTextChangeEvents(mSearchView)
-                .skip(1) /* skipping the first emission, which is being emitted automatically on subscribing*/
+                .skip(1) /* skipping the first emission, which is being emitted automatically upon subscribing */
                 .subscribe(searchViewQueryTextEvent -> {
 
                     String currentQuery = searchViewQueryTextEvent.queryText().toString();
@@ -218,7 +217,7 @@ public class SearchActivity extends AppCompatActivity implements IRecyclerLoadin
             if (mHasNextPage) {
                 mProgress.setVisibility(View.VISIBLE);
                 mIsLoading = true;
-                mCall = mManager.search(mSearchPage + 1, getQuery());
+                mCall = mApiInteractor.search(mSearchPage + 1, getQuery());
 
                 mCall.enqueue(new Callback<SearchResponse>() {
                     @Override
@@ -283,17 +282,11 @@ public class SearchActivity extends AppCompatActivity implements IRecyclerLoadin
         }
     }
 
-    @Override
-    public void onItemClicked(View logo, SearchResponse.SearchItem searchItem, int position) {
-        ImeUtils.hideIme(mSearchView);
-        mSearchView.clearFocus();
-        ListingActivity.launch(this, logo, searchItem, isItemFullyVisible(position));
-    }
-
     /**
      * @return True if the item in position {@code position} is fully visible.
      */
     private boolean isItemFullyVisible(int position) {
         return mLayoutManager.findFirstCompletelyVisibleItemPosition() <= position;
     }
+
 }

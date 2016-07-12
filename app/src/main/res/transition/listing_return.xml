@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <transitionSet xmlns:android="http://schemas.android.com/apk/res/android"
-               android:duration="@android:integer/config_mediumAnimTime"
-               android:transitionOrdering="together">
+    android:duration="@android:integer/config_mediumAnimTime"
+    android:transitionOrdering="together">
+
     <slide android:slideEdge="top">
         <targets>
-            <target android:targetId="@id/app_bar_layout"/>
+            <target android:targetId="@id/app_bar_layout" />
         </targets>
     </slide>
-    <fade/>
+
+    <fade />
+
 </transitionSet>

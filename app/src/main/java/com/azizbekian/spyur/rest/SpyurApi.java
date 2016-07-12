@@ -1,8 +1,9 @@
 package com.azizbekian.spyur.rest;
 
+import com.azizbekian.spyur.misc.LanguageType;
 import com.azizbekian.spyur.model.ListingResponse;
 import com.azizbekian.spyur.model.SearchResponse;
-import com.azizbekian.spyur.misc.LanguageType;
+
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
@@ -34,8 +35,7 @@ public interface SpyurApi {
 
     interface ListingApi {
 
-        @GET
-        Call<ListingResponse> getListing(@Url String listing);
+        @GET Call<ListingResponse> getListing(@Url String listing);
     }
 
 }

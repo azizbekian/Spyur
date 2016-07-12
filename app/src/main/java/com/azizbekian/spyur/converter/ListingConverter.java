@@ -52,7 +52,7 @@ public class ListingConverter implements Converter<ResponseBody, ListingResponse
     }
 
     private ListingConverter() {
-        mContext = SpyurApplication.getAppComponent().getApplicationContext();
+        mContext = SpyurApplication.getComponent().getApplicationContext();
     }
 
     static final ListingConverter INSTANCE = new ListingConverter();
