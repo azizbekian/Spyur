@@ -89,4 +89,5 @@ public class AppModule {
     public RequestManager provideGlide(Context context) {
         return Glide.with(context);
     }
+
 }

@@ -51,7 +51,7 @@ dependencies {
     compile libraries.rxBindingV4
     compile libraries.rxBindingV7
     compile libraries.butterknife
-    compile libraries.butterknifeCompiler
+    apt libraries.butterknifeCompiler
 
     // Misc
     compile libraries.glide

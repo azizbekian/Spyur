@@ -13,8 +13,6 @@ import com.azizbekian.spyur.misc.LanguageType;
 import com.azizbekian.spyur.model.ListingResponse;
 import com.azizbekian.spyur.model.SearchResponse;
 import com.azizbekian.spyur.rest.SpyurApi;
-import com.azizbekian.spyur.rest.SpyurApi.ListingApi;
-import com.azizbekian.spyur.rest.SpyurApi.SearchApi;
 
 import javax.inject.Inject;
 
@@ -27,11 +25,12 @@ import retrofit2.Call;
  */
 public class SpyurManager implements ApiInteractor {
 
-    private SearchApi mSearchApi;
-    private ListingApi mListingApi;
+    private SpyurApi.SearchApi mSearchApi;
+    private SpyurApi.ListingApi mListingApi;
     private @LanguageType String mLang;
 
-    public SpyurManager(SearchApi searchApi, ListingApi listingApi) {
+    @Inject
+    public SpyurManager(SpyurApi.SearchApi searchApi, SpyurApi.ListingApi listingApi) {
 
         mSearchApi = searchApi;
         mListingApi = listingApi;

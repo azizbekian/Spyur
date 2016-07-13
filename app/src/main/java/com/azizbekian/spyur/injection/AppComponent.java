@@ -24,21 +24,21 @@ public interface AppComponent {
     /**
      * Injects all the fields from object graph.
      */
-    void inject(ListingActivity listingActivity);
+     void inject(ListingActivity listingActivity);
 
     /**
      * @return {@link com.azizbekian.spyur.SpyurApplication SpyurApplication} context.
      */
-    Context getApplicationContext();
+     Context getApplicationContext();
 
     /**
      * @return Singleton {@link ApiInteractor} instance.
      */
-    ApiInteractor getApiInteractor();
+     ApiInteractor getApiInteractor();
 
     /**
      * @return Singleton {@link RequestManager} instance.
      */
-    RequestManager getGlide();
+     RequestManager getGlide();
 
 }
