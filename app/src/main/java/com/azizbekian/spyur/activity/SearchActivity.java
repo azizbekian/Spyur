@@ -13,6 +13,7 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.StyleSpan;
+import android.transition.AutoTransition;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
 import android.transition.TransitionManager;
@@ -96,8 +97,9 @@ public class SearchActivity extends AppCompatActivity implements IRecyclerLoadin
         ButterKnife.bind(this);
 
         mApiInteractor = SpyurApplication.getComponent().getApiInteractor();
-        mAutoTransition = TransitionInflater.from(this).inflateTransition(R.transition.auto);
-        mNoInternetToast = Toast.makeText(SearchActivity.this, R.string.message_no_internet, Toast.LENGTH_SHORT);
+        mAutoTransition = new AutoTransition();
+        mNoInternetToast = Toast.makeText(SearchActivity.this, R.string.message_no_internet,
+                Toast.LENGTH_SHORT);
 
         setupSearchView();
         setupRecyclerView();
@@ -172,12 +174,12 @@ public class SearchActivity extends AppCompatActivity implements IRecyclerLoadin
                     if (searchViewQueryTextEvent.isSubmitted()) {
                         if (!TextUtils.isEmpty(currentQuery)) {
                             mCleanedRecently = false;
-                            SearchActivity.this.newSearch();
-                        } else if (!mCleanedRecently) SearchActivity.this.clearResults();
+                            newSearch();
+                        } else if (!mCleanedRecently) clearResults();
                         ImeUtils.hideIme(mSearchView);
                     } else {
                         if (!mCleanedRecently || TextUtils.isEmpty(currentQuery)) {
-                            SearchActivity.this.clearResults();
+                            clearResults();
                         }
                     }
                 });
@@ -211,7 +213,6 @@ public class SearchActivity extends AppCompatActivity implements IRecyclerLoadin
         performSearch();
     }
 
-    @SuppressWarnings("StatementWithEmptyBody ")
     private void performSearch() {
         if (NetworkUtils.isNetworkAvailable(this)) {
             if (mHasNextPage) {
@@ -251,9 +252,7 @@ public class SearchActivity extends AppCompatActivity implements IRecyclerLoadin
                     }
                 });
             }
-        } else {
-            mNoInternetToast.show();
-        }
+        } else mNoInternetToast.show();
     }
 
     /**
