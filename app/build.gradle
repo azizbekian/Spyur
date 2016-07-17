@@ -40,6 +40,7 @@ dependencies {
 
     // Square
     compile libraries.retrofit
+    compile libraries.retrofitRxJava
     compile libraries.okhttpInterceptor
 
     // Rx

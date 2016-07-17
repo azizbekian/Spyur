@@ -4,10 +4,10 @@ ext.versions = [
         apt              : '1.8',
         retrolambda      : '3.2.5',
 
-        compileSdk       : 23,
+        compileSdk       : 24,
         minSdk           : 21,
         targetSdk        : 23,
-        buildTools       : '23.0.3',
+        buildTools       : '24.0.0',
         versionCode      : 1,
         versionName      : '1.0.0',
 
@@ -54,6 +54,7 @@ ext.libraries = [
 
         // Square
         retrofit           : "com.squareup.retrofit2:retrofit:$versions.retrofit",
+        retrofitRxJava     : "com.squareup.retrofit2:adapter-rxjava:$versions.retrofit",
         okhttpInterceptor  : "com.squareup.okhttp3:logging-interceptor:$versions.okhttpInterceptor",
 
         // Rx

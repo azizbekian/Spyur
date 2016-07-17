@@ -19,6 +19,7 @@ import dagger.Provides;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 
 /**
  * Created on May 09, 2016.
@@ -45,7 +46,7 @@ public class AppModule {
 
         if (BuildConfig.DEBUG) {
             HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-            interceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
+            interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
             builder.addInterceptor(interceptor).addInterceptor(chain -> {
                 // Simulating network delay
                 // SystemClock.sleep(3000);
@@ -63,6 +64,7 @@ public class AppModule {
                 .baseUrl(SpyurApi.ENDPOINT)
                 .client(client)
                 .addConverterFactory(new SearchConverter.Factory())
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build()
                 .create(SpyurApi.SearchApi.class);
     }
@@ -74,6 +76,7 @@ public class AppModule {
                 .baseUrl(SpyurApi.ENDPOINT)
                 .client(client)
                 .addConverterFactory(new ListingConverter.Factory())
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build()
                 .create(SpyurApi.ListingApi.class);
     }

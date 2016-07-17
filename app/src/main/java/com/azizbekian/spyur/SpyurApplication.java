@@ -1,6 +1,7 @@
 package com.azizbekian.spyur;
 
 import android.app.Application;
+import android.content.Context;
 
 import com.azizbekian.spyur.injection.AppComponent;
 import com.azizbekian.spyur.injection.AppModule;
@@ -26,6 +27,10 @@ public class SpyurApplication extends Application {
 
     public static AppComponent getComponent() {
         return sAppComponent;
+    }
+
+    public static Context getContext() {
+        return sAppComponent.getApplicationContext();
     }
 
 }

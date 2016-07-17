@@ -19,7 +19,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.util.Pair;
 import android.support.v4.widget.NestedScrollView;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
@@ -41,6 +40,7 @@ import android.widget.Toast;
 
 import com.azizbekian.spyur.R;
 import com.azizbekian.spyur.SpyurApplication;
+import com.azizbekian.spyur.activity.base.RxBaseActivity;
 import com.azizbekian.spyur.api.ApiInteractor;
 import com.azizbekian.spyur.listener.AppBarStateChangeListener;
 import com.azizbekian.spyur.listener.AppBarStateChangeListener.AppBarState;
@@ -50,6 +50,7 @@ import com.azizbekian.spyur.model.SearchResponse.SearchItem;
 import com.azizbekian.spyur.utils.AnimUtils;
 import com.azizbekian.spyur.utils.LogUtils;
 import com.azizbekian.spyur.utils.NetworkUtils;
+import com.azizbekian.spyur.utils.RxUtils;
 import com.azizbekian.spyur.utils.TransitionUtils;
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.RequestManager;
@@ -73,9 +74,7 @@ import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import rx.Subscriber;
 
 import static android.view.View.MeasureSpec.makeMeasureSpec;
 import static com.azizbekian.spyur.listener.AppBarStateChangeListener.EXPANDED;
@@ -85,7 +84,7 @@ import static com.azizbekian.spyur.listener.AppBarStateChangeListener.EXPANDED;
  *
  * @author Andranik Azizbekian (andranik.azizbekyan@gmail.com)
  */
-public class ListingActivity extends AppCompatActivity
+public class ListingActivity extends RxBaseActivity
         implements YouTubePlayer.OnInitializedListener {
 
     private static final String EXTRA_SEARCH_ITEM = "extra_search_item";
@@ -165,7 +164,6 @@ public class ListingActivity extends AppCompatActivity
     private Transition mainCardAutoTransition;
     private Transition mImagesAndVideoTransition;
     private SearchItem mSearchItem;
-    private Call<ListingResponse> mCall;
     private int mPaletteVibrant;
     private Rect mMapLogoRect;
     private ListingResponse mListingResponse;
@@ -289,14 +287,26 @@ public class ListingActivity extends AppCompatActivity
     }
 
     private void retrieveData(String href) {
-        if (NetworkUtils.isNetworkAvailable(this) && null == mCall) {
+        if (NetworkUtils.isConnected(this) && !hasSubscriptions()) {
             showProgressBar(true);
-            mCall = apiInteractor.getListing(href);
-            mCall.enqueue(new Callback<ListingResponse>() {
-                @Override
-                public void onResponse(Call<ListingResponse> call, Response<ListingResponse> response) {
+
+            addSubscription(apiInteractor.getListing(href)
+                    .compose(RxUtils.applyIOtoMainThreadSchedulers())
+                    .subscribe(new Subscriber<ListingResponse>() {
+                @Override public void onCompleted() {
+
+                }
+
+                @Override public void onError(Throwable e) {
+                    showProgressBar(false);
+                    // TODO: show message "failure"
                     mIsRetrievalPending = false;
-                    mListingResponse = response.body();
+                    LogUtils.e("Failure loading listing: " + e.getMessage());
+                }
+
+                @Override public void onNext(ListingResponse listingResponse) {
+                    mIsRetrievalPending = false;
+                    mListingResponse = listingResponse;
                     if (null != mListingResponse) {
                         setupContent(mListingResponse);
                     } else {
@@ -305,15 +315,7 @@ public class ListingActivity extends AppCompatActivity
                         LogUtils.e("Null response received when fetching listing.");
                     }
                 }
-
-                @Override
-                public void onFailure(Call<ListingResponse> call, Throwable t) {
-                    showProgressBar(false);
-                    // TODO: show message "failure"
-                    mIsRetrievalPending = false;
-                    LogUtils.e("Failure loading listing: " + t.getMessage());
-                }
-            });
+            }));
         } else {
             showProgressBar(true);
             Toast.makeText(ListingActivity.this, R.string.message_no_internet, Toast.LENGTH_SHORT).show();
@@ -346,10 +348,7 @@ public class ListingActivity extends AppCompatActivity
             mConnectivityManager.unregisterNetworkCallback(mConnectivityCallback);
             mIsMonitoringConnectivity = false;
         }
-        if (null != mCall) {
-            mCall.cancel();
-            mCall = null;
-        }
+        unsubscribe();
         if (isFinishing() && null != mYoutubePlayer) {
             mYoutubePlayer.pause();
             mYoutubePlayer.release();

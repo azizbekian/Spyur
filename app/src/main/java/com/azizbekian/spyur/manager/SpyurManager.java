@@ -17,6 +17,7 @@ import com.azizbekian.spyur.rest.SpyurApi;
 import javax.inject.Inject;
 
 import retrofit2.Call;
+import rx.Observable;
 
 /**
  * Created on May 09, 2016.
@@ -53,14 +54,14 @@ public class SpyurManager implements ApiInteractor {
     }
 
     @Override
-    public Call<SearchResponse> search(@IntRange(from = 1, to = Integer.MAX_VALUE) int page,
-                                       @NonNull String query) {
+    public Observable<SearchResponse> search(@IntRange(from = 1, to = Integer.MAX_VALUE) int page,
+                                             @NonNull String query) {
 
         return mSearchApi.search(mLang, page, query);
     }
 
     @Override
-    public Call<ListingResponse> getListing(@NonNull String href) {
+    public Observable<ListingResponse> getListing(@NonNull String href) {
         return mListingApi.getListing(href);
     }
 

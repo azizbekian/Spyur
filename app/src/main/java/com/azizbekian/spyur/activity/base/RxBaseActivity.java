@@ -34,6 +34,19 @@ public abstract class RxBaseActivity extends BaseActivity {
      */
     protected void unsubscribe() {
         mSubscriptions.unsubscribe();
+        // Once CompositeSubscription.unsubscribe() is called the object is unusable,
+        // as it will automatically unsubscribe anything that is added to it afterwards!
+        // A new CompositeSubscription must be created as a replacement.
+        mSubscriptions = new CompositeSubscription();
+    }
+
+    /**
+     * Returns true if this composite is not unsubscribed and contains subscriptions.
+     *
+     * @return {@code true} if this composite is not unsubscribed and contains subscriptions.
+     */
+    protected boolean hasSubscriptions() {
+        return mSubscriptions.hasSubscriptions();
     }
 
 }

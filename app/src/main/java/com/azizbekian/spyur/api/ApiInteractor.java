@@ -7,6 +7,7 @@ import com.azizbekian.spyur.model.ListingResponse;
 import com.azizbekian.spyur.model.SearchResponse;
 
 import retrofit2.Call;
+import rx.Observable;
 
 /**
  * Created on Jul 13, 2016.
@@ -20,14 +21,14 @@ public interface ApiInteractor {
      *
      * @param page A value starting from 1 (inclusive).
      */
-    Call<SearchResponse> search(@IntRange(from = 1, to = Integer.MAX_VALUE) int page,
-                                @NonNull String query);
+    Observable<SearchResponse> search(@IntRange(from = 1, to = Integer.MAX_VALUE) int page,
+                                      @NonNull String query);
 
     /**
      * Fetches the detail info of a listing with URL {@code href}.
      *
      * @param href The url, where the listing is located.
      */
-    Call<ListingResponse> getListing(@NonNull String href);
+    Observable<ListingResponse> getListing(@NonNull String href);
 
 }
