@@ -109,7 +109,7 @@ public class SearchActivity extends RxBaseActivity implements SearchContract.Vie
 
         RxSearchView
                 .queryTextChangeEvents(mSearchView)
-                .skip(1) /* skipping the first emission, which is being emitted automatically upon subscribing */
+                .skip(1) /* skipping the first emission, which happens upon subscribing */
                 .subscribe(queryTextEventAction1);
     }
 

@@ -41,12 +41,13 @@ import android.widget.Toast;
 import com.azizbekian.spyur.R;
 import com.azizbekian.spyur.SpyurApplication;
 import com.azizbekian.spyur.activity.base.RxBaseActivity;
-import com.azizbekian.spyur.api.ApiInteractor;
 import com.azizbekian.spyur.listener.AppBarStateChangeListener;
 import com.azizbekian.spyur.listener.AppBarStateChangeListener.AppBarState;
 import com.azizbekian.spyur.misc.Constants;
 import com.azizbekian.spyur.model.ListingResponse;
 import com.azizbekian.spyur.model.SearchResponse.SearchItem;
+import com.azizbekian.spyur.mvp.listing.ListingContract;
+import com.azizbekian.spyur.mvp.listing.ListingPresenter;
 import com.azizbekian.spyur.utils.AnimUtils;
 import com.azizbekian.spyur.utils.LogUtils;
 import com.azizbekian.spyur.utils.NetworkUtils;
@@ -68,13 +69,12 @@ import com.google.android.youtube.player.YouTubePlayerFragment;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.Subscriber;
+import rx.Subscription;
 
 import static android.view.View.MeasureSpec.makeMeasureSpec;
 import static com.azizbekian.spyur.listener.AppBarStateChangeListener.EXPANDED;
@@ -84,10 +84,9 @@ import static com.azizbekian.spyur.listener.AppBarStateChangeListener.EXPANDED;
  *
  * @author Andranik Azizbekian (andranik.azizbekyan@gmail.com)
  */
-public class ListingActivity extends RxBaseActivity
-        implements YouTubePlayer.OnInitializedListener {
+public class ListingActivity extends RxBaseActivity implements ListingContract.View,
+        YouTubePlayer.OnInitializedListener {
 
-    private static final String EXTRA_SEARCH_ITEM = "extra_search_item";
     private static final String TAG_YOUTUBE = "tag_youtube";
     private static final int DURATION_REVEAL = 1300;
     private static final int DURATION_SLIDE_PAGE_CHANGE = 4000;
@@ -107,7 +106,7 @@ public class ListingActivity extends RxBaseActivity
                               boolean isTransitionViewFullyVisible) {
 
         Intent intent = new Intent(activity, ListingActivity.class);
-        intent.putExtra(EXTRA_SEARCH_ITEM, searchItem);
+        intent.putExtra(ListingPresenter.EXTRA_SEARCH_ITEM, searchItem);
 
         final Pair[] pairs = TransitionUtils.createSafeTransitionParticipants(activity, true,
                 isTransitionViewFullyVisible ?
@@ -153,17 +152,14 @@ public class ListingActivity extends RxBaseActivity
     @BindColor(R.color.colorPrimary) int colorPrimary;
     @BindColor(R.color.colorPrimaryDark) int colorPrimaryDark;
     @BindColor(android.R.color.transparent) int transparentColor;
-    @Inject ApiInteractor apiInteractor;
-    @Inject RequestManager glide;
 
+    private RequestManager mGlide;
     private SliderLayout mSliderLayout;
     private ConnectivityManager mConnectivityManager;
-    private @AppBarState int mAppBarState = EXPANDED;
     private Animator mBackgroundRevealAnimator;
     private TransitionInflater mTransitionInflater;
     private Transition mainCardAutoTransition;
     private Transition mImagesAndVideoTransition;
-    private SearchItem mSearchItem;
     private int mPaletteVibrant;
     private Rect mMapLogoRect;
     private ListingResponse mListingResponse;
@@ -211,6 +207,10 @@ public class ListingActivity extends RxBaseActivity
      * being updated after shared element's return callback.
      */
     private boolean mOnBackPressed;
+    private @AppBarState int mAppBarState = EXPANDED;
+
+
+    private ListingContract.Presenter mPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -218,14 +218,17 @@ public class ListingActivity extends RxBaseActivity
         setContentView(R.layout.activity_listing);
         ButterKnife.bind(this);
 
-        SpyurApplication.getComponent().inject(this);
+        checkInputAndThrow(ListingPresenter.EXTRA_SEARCH_ITEM);
+        mPresenter = new ListingPresenter(this, getIntent().getExtras());
+        mPresenter.create();
 
         supportPostponeEnterTransition();
         // Using setEnterSharedElementCallback, which is being called for return transition too.
-        setEnterSharedElementCallback(mReturnSharedElementCallback);
+        setEnterSharedElementCallback(mPresenter.provideSharedElementCallback());
         getWindow().getEnterTransition().addListener(mOnTransitionEndListener);
 
-        mSearchItem = getIntent().getExtras().getParcelable(EXTRA_SEARCH_ITEM);
+        mGlide = SpyurApplication.getComponent().getGlide();
+
         analyzeLogo();
 
         mTransitionInflater = TransitionInflater.from(this);
@@ -259,7 +262,7 @@ public class ListingActivity extends RxBaseActivity
      * colors. After that activity's postponed enter transition is being started.
      */
     private void analyzeLogo() {
-        glide
+        mGlide
                 .load(mSearchItem.getLogo())
                 .asBitmap()
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
@@ -293,29 +296,29 @@ public class ListingActivity extends RxBaseActivity
             addSubscription(apiInteractor.getListing(href)
                     .compose(RxUtils.applyIOtoMainThreadSchedulers())
                     .subscribe(new Subscriber<ListingResponse>() {
-                @Override public void onCompleted() {
+                        @Override public void onCompleted() {
 
-                }
+                        }
 
-                @Override public void onError(Throwable e) {
-                    showProgressBar(false);
-                    // TODO: show message "failure"
-                    mIsRetrievalPending = false;
-                    LogUtils.e("Failure loading listing: " + e.getMessage());
-                }
+                        @Override public void onError(Throwable e) {
+                            showProgressBar(false);
+                            // TODO: show message "failure"
+                            mIsRetrievalPending = false;
+                            LogUtils.e("Failure loading listing: " + e.getMessage());
+                        }
 
-                @Override public void onNext(ListingResponse listingResponse) {
-                    mIsRetrievalPending = false;
-                    mListingResponse = listingResponse;
-                    if (null != mListingResponse) {
-                        setupContent(mListingResponse);
-                    } else {
-                        showProgressBar(false);
-                        // TODO: show message "error data"
-                        LogUtils.e("Null response received when fetching listing.");
-                    }
-                }
-            }));
+                        @Override public void onNext(ListingResponse listingResponse) {
+                            mIsRetrievalPending = false;
+                            mListingResponse = listingResponse;
+                            if (null != mListingResponse) {
+                                setupContent(mListingResponse);
+                            } else {
+                                showProgressBar(false);
+                                // TODO: show message "error data"
+                                LogUtils.e("Null response received when fetching listing.");
+                            }
+                        }
+                    }));
         } else {
             showProgressBar(true);
             Toast.makeText(ListingActivity.this, R.string.message_no_internet, Toast.LENGTH_SHORT).show();
@@ -587,7 +590,7 @@ public class ListingActivity extends RxBaseActivity
                     mIsImagesAndVideoTransitionEnded = true;
                 }
             });
-            mImagesAndVideoTransition.setInterpolator(AnimUtils.getFastOutSlowInInterpolator(ListingActivity.this));
+            mImagesAndVideoTransition.setInterpolator(AnimUtils.getFastOutSlowInInterpolator(this));
             TransitionManager.beginDelayedTransition(cardRoot, mImagesAndVideoTransition);
             if (null != imagesCard) imagesCard.setVisibility(View.VISIBLE);
             if (null != videoCard) videoCard.setVisibility(View.VISIBLE);
@@ -668,18 +671,6 @@ public class ListingActivity extends RxBaseActivity
 
     // Callbacks & listeners
 
-    private final SharedElementCallback mReturnSharedElementCallback = new SharedElementCallback() {
-        @Override
-        public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
-            if (mOnBackPressed && mAppBarState != EXPANDED) {
-                // if this callback is fired when leaving activity and if app bar state is not expanded
-                // clear the shared view from map, we do not want back transition animation
-                names.clear();
-                sharedElements.clear();
-            }
-        }
-    };
-
     /**
      * Is responsible for handling connectivity changes properly.
      */
@@ -749,16 +740,14 @@ public class ListingActivity extends RxBaseActivity
         }
     };
 
-    private final AnimUtils.TransitionListenerAdapter mOnTransitionEndListener
-            = new AnimUtils.TransitionListenerAdapter() {
-        @Override
-        public void onTransitionEnd(Transition transition) {
-            getWindow().getEnterTransition().removeListener(this);
-            if (null != mBackgroundRevealAnimator && !mBackgroundRevealAnimator.isStarted()) {
-                mBackgroundRevealAnimator.start();
-            }
-            retrieveData(mSearchItem.getHref());
-        }
-    };
+    //////////////////////////////
 
+
+    @Override public void delegateAddSubscription(Subscription s) {
+        addSubscription(s);
+    }
+
+    @Override public void delegateUnsubscribe() {
+        unsubscribe();
+    }
 }

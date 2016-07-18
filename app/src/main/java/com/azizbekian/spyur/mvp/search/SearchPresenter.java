@@ -53,7 +53,7 @@ public class SearchPresenter extends SimplePresenter implements SearchContract.P
     private static final int THRESHOLD_LOAD_MORE = 10;
 
     @Nullable SearchContract.View mView;
-    @NonNull SearchContract.Model mModel;
+    @NonNull SearchContract.Model mModel = new SearchModel();
 
     private int mSearchPage = SpyurApi.SearchApi.INITIAL_SEARCH_PAGE - 1;
     private boolean mIsLoading;
@@ -69,8 +69,6 @@ public class SearchPresenter extends SimplePresenter implements SearchContract.P
 
     public SearchPresenter(@NonNull SearchContract.View view) {
         this.mView = view;
-
-        mModel = new SearchModel();
     }
 
     @Override public void create() {
