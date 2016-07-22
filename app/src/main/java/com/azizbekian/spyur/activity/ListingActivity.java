@@ -149,9 +149,9 @@ public class ListingActivity extends RxBaseActivity implements ListingContract.V
         ButterKnife.bind(this);
 
         checkInputAndThrow(ListingPresenter.EXTRA_SEARCH_ITEM);
+        mGlide = SpyurApplication.getComponent().getGlide();
         mPresenter = new ListingPresenter(this, getIntent().getExtras());
         mPresenter.create();
-        mGlide = SpyurApplication.getComponent().getGlide();
     }
 
     @Override

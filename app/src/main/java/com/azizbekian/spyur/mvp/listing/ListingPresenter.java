@@ -160,9 +160,11 @@ public class ListingPresenter extends SimplePresenter implements ListingContract
                         } else if (!TextUtils.isEmpty(mListingResponse.videoUrl)) {
                             mImagesAndVideoTransition = mView.inflateTransition(R.transition.image_video_card);
                         }
-                        mImagesAndVideoTransition.addListener(mImageVideoTransitionListener);
-                        mImagesAndVideoTransition.setInterpolator(AnimUtils.
-                                getFastOutSlowInInterpolator(SpyurApplication.getContext()));
+                        if (null != mImagesAndVideoTransition) {
+                            mImagesAndVideoTransition.addListener(mImageVideoTransitionListener);
+                            mImagesAndVideoTransition.setInterpolator(AnimUtils.
+                                    getFastOutSlowInInterpolator(SpyurApplication.getContext()));
+                        }
 
                         mView.setupImagesAndVideo(mListingResponse.images, mListingResponse.videoUrl,
                                 mImagesAndVideoTransition, mYoutubeInitializedListener);
