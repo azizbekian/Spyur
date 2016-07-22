@@ -13,6 +13,7 @@ import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkRequest;
 import android.os.Bundle;
+import android.support.annotation.StringRes;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.ActivityCompat;
@@ -30,6 +31,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewStub;
+import android.view.animation.Interpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -88,7 +90,6 @@ public class ListingActivity extends RxBaseActivity implements ListingContract.V
         YouTubePlayer.OnInitializedListener {
 
     private static final String TAG_YOUTUBE = "tag_youtube";
-    private static final int DURATION_REVEAL = 1300;
     private static final int DURATION_SLIDE_PAGE_CHANGE = 4000;
     private static final int YOUTUBE_RECOVERY_DIALOG_REQUEST = 821;
 
@@ -149,14 +150,9 @@ public class ListingActivity extends RxBaseActivity implements ListingContract.V
     @BindView(R.id.viewstub_youtube) ViewStub videoViewStub;
     @BindView(R.id.viewstub_empty_listing) ViewStub emptyListingViewStub;
 
-    @BindColor(R.color.colorPrimary) int colorPrimary;
-    @BindColor(R.color.colorPrimaryDark) int colorPrimaryDark;
-    @BindColor(android.R.color.transparent) int transparentColor;
-
     private RequestManager mGlide;
     private SliderLayout mSliderLayout;
     private ConnectivityManager mConnectivityManager;
-    private Animator mBackgroundRevealAnimator;
     private TransitionInflater mTransitionInflater;
     private Transition mainCardAutoTransition;
     private Transition mImagesAndVideoTransition;
@@ -225,7 +221,15 @@ public class ListingActivity extends RxBaseActivity implements ListingContract.V
         supportPostponeEnterTransition();
         // Using setEnterSharedElementCallback, which is being called for return transition too.
         setEnterSharedElementCallback(mPresenter.provideSharedElementCallback());
-        getWindow().getEnterTransition().addListener(mOnTransitionEndListener);
+        getWindow().getEnterTransition().addListener(new AnimUtils.TransitionListenerAdapter(){
+            @Override public void onTransitionEnd(Transition transition) {
+                super.onTransitionEnd(transition);
+
+                getWindow().getEnterTransition().removeListener(this);
+                mPresenter.startRevealAnimation();
+                mPresenter.retrieveListingData();
+            }
+        });
 
         mGlide = SpyurApplication.getComponent().getGlide();
 
@@ -257,13 +261,10 @@ public class ListingActivity extends RxBaseActivity implements ListingContract.V
         collapsingToolbarLayout.setExpandedTitleColor(transparentColor);
     }
 
-    /**
-     * Creates {@link Palette} object from the logo, updates necessary views for appropriate
-     * colors. After that activity's postponed enter transition is being started.
-     */
-    private void analyzeLogo() {
+    @Override
+    public void analyzeLogo(SearchItem searchItem) {
         mGlide
-                .load(mSearchItem.getLogo())
+                .load(searchItem.getLogo())
                 .asBitmap()
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                 .priority(Priority.IMMEDIATE)
@@ -278,58 +279,16 @@ public class ListingActivity extends RxBaseActivity implements ListingContract.V
                     @Override
                     public boolean onResourceReady(Bitmap resource, String model, Target<Bitmap> target,
                                                    boolean isFromMemoryCache, boolean isFirstResource) {
-                        Palette.from(resource)
-                                .generate(palette -> {
-                                    applyPalette(palette);
-                                    supportStartPostponedEnterTransition();
-                                });
+
+                        int[] loc = new int[2];
+                        logoCard.getLocationOnScreen(loc);
+                        mPresenter.onResourceReady(resource, loc, logoCard.getWidth(),
+                                logoCard.getHeight(), headerLayout.getWidth(),
+                                headerLayout.getHeight());
                         return false;
                     }
                 })
                 .into(logo);
-    }
-
-    private void retrieveData(String href) {
-        if (NetworkUtils.isConnected(this) && !hasSubscriptions()) {
-            showProgressBar(true);
-
-            addSubscription(apiInteractor.getListing(href)
-                    .compose(RxUtils.applyIOtoMainThreadSchedulers())
-                    .subscribe(new Subscriber<ListingResponse>() {
-                        @Override public void onCompleted() {
-
-                        }
-
-                        @Override public void onError(Throwable e) {
-                            showProgressBar(false);
-                            // TODO: show message "failure"
-                            mIsRetrievalPending = false;
-                            LogUtils.e("Failure loading listing: " + e.getMessage());
-                        }
-
-                        @Override public void onNext(ListingResponse listingResponse) {
-                            mIsRetrievalPending = false;
-                            mListingResponse = listingResponse;
-                            if (null != mListingResponse) {
-                                setupContent(mListingResponse);
-                            } else {
-                                showProgressBar(false);
-                                // TODO: show message "error data"
-                                LogUtils.e("Null response received when fetching listing.");
-                            }
-                        }
-                    }));
-        } else {
-            showProgressBar(true);
-            Toast.makeText(ListingActivity.this, R.string.message_no_internet, Toast.LENGTH_SHORT).show();
-            mConnectivityManager.registerNetworkCallback(new NetworkRequest
-                            .Builder()
-                            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-                            .build(),
-                    mConnectivityCallback);
-            mIsRetrievalPending = true;
-            mIsMonitoringConnectivity = true;
-        }
     }
 
     @Override
@@ -379,53 +338,13 @@ public class ListingActivity extends RxBaseActivity implements ListingContract.V
         super.finishAfterTransition();
     }
 
-    /**
-     * @param show If true shows loading mProgress bar, otherwise hides.
-     */
-    private void showProgressBar(boolean show) {
+    @Override
+    public void showProgressBar(boolean show) {
         if (show) {
             progressBar.getIndeterminateDrawable().setColorFilter(mPaletteVibrant,
                     android.graphics.PorterDuff.Mode.SRC_ATOP);
             progressBarLayout.setVisibility(View.VISIBLE);
         } else progressBarLayout.setVisibility(View.GONE);
-    }
-
-    /**
-     * Applies the generated {@link Palette} to views.
-     */
-    private void applyPalette(Palette palette) {
-        mPaletteVibrant = palette.getVibrantColor(colorPrimary);
-        int paletteLightVibrant = palette.getLightVibrantColor(colorPrimaryDark);
-
-        collapsingToolbarLayout.setContentScrimColor(paletteLightVibrant);
-        collapsingToolbarLayout.setStatusBarScrimColor(paletteLightVibrant);
-
-        int[] loc = new int[2];
-        logoCard.getLocationOnScreen(loc);
-        int revealStartX = loc[0] + logoCard.getWidth() / 2;
-        int revealStartY = loc[1] + logoCard.getHeight() / 2;
-
-        int widthMode = makeMeasureSpec(headerLayout.getWidth(), View.MeasureSpec.EXACTLY);
-        int heightMode = makeMeasureSpec(headerLayout.getHeight(), View.MeasureSpec.EXACTLY);
-        logoBackground.measure(widthMode, heightMode);
-        logoBackground.setBackgroundColor(mPaletteVibrant);
-        float finalRadius = (float) Math.hypot(logoBackground.getMeasuredWidth(),
-                logoBackground.getMeasuredHeight());
-        mBackgroundRevealAnimator = ViewAnimationUtils.createCircularReveal(logoBackground,
-                revealStartX, revealStartY, 0, finalRadius);
-        mBackgroundRevealAnimator.setDuration(DURATION_REVEAL);
-        mBackgroundRevealAnimator.setInterpolator(AnimUtils.EASE_OUT_CUBIC);
-        mBackgroundRevealAnimator.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                logoBackground.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                mBackgroundRevealAnimator.removeListener(this);
-            }
-        });
     }
 
     /**
@@ -749,5 +668,48 @@ public class ListingActivity extends RxBaseActivity implements ListingContract.V
 
     @Override public void delegateUnsubscribe() {
         unsubscribe();
+    }
+
+    @Override public int[] measureLogoBackground(int widthMode, int heightMode) {
+        logoBackground.measure(widthMode, heightMode)
+        return new int[]{logoBackground.getMeasuredWidth(), logoBackground.getMeasuredHeight()};
+    }
+
+    @Override
+    public Animator createCircularRevealAnimator(int revealStartX, int revealStartY, int startRadius,
+                                                 int finalRadius, int duration, Interpolator interpolator,
+                                                 AnimatorListenerAdapter listenerAdapter) {
+
+        Animator animator = ViewAnimationUtils.createCircularReveal(logoBackground,
+                revealStartX, revealStartY, startRadius, finalRadius);
+        animator.setDuration(duration);
+        animator.setInterpolator(interpolator);
+        animator.addListener(listenerAdapter);
+        return animator;
+    }
+
+    @Override public void setupCollapsingToolbarLayout(int color) {
+        collapsingToolbarLayout.setContentScrimColor(color);
+        collapsingToolbarLayout.setStatusBarScrimColor(color);
+    }
+
+    @Override public void setLogoBackgroundColor(int color) {
+        logoBackground.setBackgroundColor(color);
+    }
+
+    @Override public void delegateStartPosponedEnterTransition() {
+        supportStartPostponedEnterTransition();
+    }
+
+    @Override public void setLogoBackgroundVisibility(boolean show) {
+        logoBackground.setVisibility(show ? View.VISIBLE : View.GONE);
+    }
+
+    @Override public boolean delegateHasSubscriptions() {
+        return hasSubscriptions();
+    }
+
+    @Override public void showToast(@StringRes int message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }

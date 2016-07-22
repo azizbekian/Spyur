@@ -1,5 +1,10 @@
 package com.azizbekian.spyur.mvp;
 
+import android.support.v7.graphics.Palette;
+
+import com.azizbekian.spyur.model.SearchResponse;
+import com.azizbekian.spyur.model.SearchResponse.SearchItem;
+
 import rx.Subscription;
 
 /**
@@ -11,6 +16,12 @@ import rx.Subscription;
 public interface BaseContract {
 
     interface View {
+
+        /**
+         * Creates {@link Palette} object from the logo, updates necessary views for appropriate
+         * colors. After that activity's postponed enter transition is being started.
+         */
+        void analyzeLogo(SearchItem searchItem);
 
     }
 
@@ -56,6 +67,13 @@ public interface BaseContract {
          * Delegates unsubscription request to the hosting fragment/activity.
          */
         void delegateUnsubscribe();
+
+        /**
+         * Returns true if this composite is not unsubscribed and contains subscriptions.
+         *
+         * @return {@code true} if this composite is not unsubscribed and contains subscriptions.
+         */
+        boolean delegateHasSubscriptions();
     }
 
     interface Model {
