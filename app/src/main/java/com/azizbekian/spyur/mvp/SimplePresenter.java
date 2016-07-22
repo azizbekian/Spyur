@@ -1,5 +1,7 @@
 package com.azizbekian.spyur.mvp;
 
+import android.content.Intent;
+
 /**
  * Created on Jul 17, 2016.
  *
@@ -11,6 +13,10 @@ public class SimplePresenter implements BaseContract.Presenter {
 
     }
 
+    @Override public void start() {
+
+    }
+
     @Override public void resume() {
 
     }
@@ -19,11 +25,19 @@ public class SimplePresenter implements BaseContract.Presenter {
 
     }
 
+    @Override public void stop() {
+
+    }
+
     @Override public void destroy() {
 
     }
 
     @Override public boolean onBackPressed() {
+        return false;
+    }
+
+    @Override public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
         return false;
     }
 }

@@ -1,9 +1,12 @@
 package com.azizbekian.spyur.mvp;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.support.v7.graphics.Palette;
 
 import com.azizbekian.spyur.model.SearchResponse;
 import com.azizbekian.spyur.model.SearchResponse.SearchItem;
+import com.bumptech.glide.request.RequestListener;
 
 import rx.Subscription;
 
@@ -17,12 +20,6 @@ public interface BaseContract {
 
     interface View {
 
-        /**
-         * Creates {@link Palette} object from the logo, updates necessary views for appropriate
-         * colors. After that activity's postponed enter transition is being started.
-         */
-        void analyzeLogo(SearchItem searchItem);
-
     }
 
     interface Presenter {
@@ -31,6 +28,11 @@ public interface BaseContract {
          * Called, when the hosting activity's or fragment's {@code onCreate()} has been called.
          */
         void create();
+
+        /**
+         * Called, when the hosting activity's or fragment's {@code onStart()} has been called.
+         */
+        void start();
 
         /**
          * Called, when the hosting activity's or fragment's {@code onResume()} has been called.
@@ -43,6 +45,11 @@ public interface BaseContract {
         void pause();
 
         /**
+         * Called, when the hosting activity's or fragment's {@code onStop()} has been called.
+         */
+        void stop();
+
+        /**
          * Called, when the hosting activity's or fragment's {@code onDestroy()} has been called.
          */
         void destroy();
@@ -53,6 +60,14 @@ public interface BaseContract {
          * @return True - if the presenter has consumed this event. False otherwise.
          */
         boolean onBackPressed();
+
+        /**
+         * Called, when {@link android.app.Activity#onActivityResult(int, int, Intent) onActivityResult()}
+         * is being called in hosting fragment/activity.
+         *
+         * @return True - if the presenter has consumed this event. False otherwise.
+         */
+        boolean onActivityResult(int requestCode, int resultCode, Intent data);
 
     }
 

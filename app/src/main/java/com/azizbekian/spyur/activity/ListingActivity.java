@@ -9,18 +9,18 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.net.ConnectivityManager;
-import android.net.Network;
-import android.net.NetworkCapabilities;
-import android.net.NetworkRequest;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
+import android.support.annotation.TransitionRes;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.util.Pair;
 import android.support.v4.widget.NestedScrollView;
-import android.support.v7.graphics.Palette;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -44,22 +44,18 @@ import com.azizbekian.spyur.R;
 import com.azizbekian.spyur.SpyurApplication;
 import com.azizbekian.spyur.activity.base.RxBaseActivity;
 import com.azizbekian.spyur.listener.AppBarStateChangeListener;
-import com.azizbekian.spyur.listener.AppBarStateChangeListener.AppBarState;
 import com.azizbekian.spyur.misc.Constants;
 import com.azizbekian.spyur.model.ListingResponse;
 import com.azizbekian.spyur.model.SearchResponse.SearchItem;
 import com.azizbekian.spyur.mvp.listing.ListingContract;
 import com.azizbekian.spyur.mvp.listing.ListingPresenter;
 import com.azizbekian.spyur.utils.AnimUtils;
-import com.azizbekian.spyur.utils.LogUtils;
-import com.azizbekian.spyur.utils.NetworkUtils;
-import com.azizbekian.spyur.utils.RxUtils;
+import com.azizbekian.spyur.utils.FragmentUtils;
 import com.azizbekian.spyur.utils.TransitionUtils;
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
 import com.daimajia.slider.library.SliderLayout;
 import com.daimajia.slider.library.SliderTypes.BaseSliderView;
 import com.daimajia.slider.library.SliderTypes.TextSliderView;
@@ -69,29 +65,21 @@ import com.google.android.youtube.player.YouTubePlayer;
 import com.google.android.youtube.player.YouTubePlayerFragment;
 
 import java.util.List;
-import java.util.Map;
 
-import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import rx.Subscriber;
 import rx.Subscription;
-
-import static android.view.View.MeasureSpec.makeMeasureSpec;
-import static com.azizbekian.spyur.listener.AppBarStateChangeListener.EXPANDED;
 
 /**
  * Created on May 09, 2016.
  *
  * @author Andranik Azizbekian (andranik.azizbekyan@gmail.com)
  */
-public class ListingActivity extends RxBaseActivity implements ListingContract.View,
-        YouTubePlayer.OnInitializedListener {
+public class ListingActivity extends RxBaseActivity implements ListingContract.View {
 
     private static final String TAG_YOUTUBE = "tag_youtube";
     private static final int DURATION_SLIDE_PAGE_CHANGE = 4000;
-    private static final int YOUTUBE_RECOVERY_DIALOG_REQUEST = 821;
 
     /**
      * @param activity                     The activity that launches {@link ListingActivity}
@@ -152,60 +140,6 @@ public class ListingActivity extends RxBaseActivity implements ListingContract.V
 
     private RequestManager mGlide;
     private SliderLayout mSliderLayout;
-    private ConnectivityManager mConnectivityManager;
-    private TransitionInflater mTransitionInflater;
-    private Transition mainCardAutoTransition;
-    private Transition mImagesAndVideoTransition;
-    private int mPaletteVibrant;
-    private Rect mMapLogoRect;
-    private ListingResponse mListingResponse;
-    private YouTubePlayer mYoutubePlayer;
-    private YouTubePlayerFragment youTubePlayerFragment;
-
-    /**
-     * Indicates, whether there has been a connectivity loss while retrieving data. If true - the
-     * connection has been lost.
-     */
-    private boolean mIsMonitoringConnectivity;
-
-    /**
-     * Tracks whether the content should be downloaded, which was interrupted because of connection
-     * loss. If true - the content should be downloaded.
-     */
-    private boolean mIsRetrievalPending;
-
-    /**
-     * If true - images and video transition animation have been ended.
-     */
-    private boolean mIsImagesAndVideoTransitionEnded;
-
-    /**
-     * Tracks, whether the map icon animation has been shown. If true - the animation hasn't been
-     * shown.
-     */
-    private boolean mIsMapAnimPending;
-
-    /**
-     * Prevents back button press when the initial setup transition is running.
-     * <p>
-     * If true, drops back button press.
-     */
-    private boolean mIsAutoTransitionRunning;
-
-    /**
-     * If true - map's logo coordinates haven't been saved in order to handle clicks.
-     */
-    private boolean mIsMapIconCoordinatesSavingPending;
-
-    /**
-     * If true - user has pressed back button. Is neccessary particularly for tracking shared element
-     * return callback. {@link Activity#isFinishing()} can't be used instead, because it's value is
-     * being updated after shared element's return callback.
-     */
-    private boolean mOnBackPressed;
-    private @AppBarState int mAppBarState = EXPANDED;
-
-
     private ListingContract.Presenter mPresenter;
 
     @Override
@@ -217,11 +151,12 @@ public class ListingActivity extends RxBaseActivity implements ListingContract.V
         checkInputAndThrow(ListingPresenter.EXTRA_SEARCH_ITEM);
         mPresenter = new ListingPresenter(this, getIntent().getExtras());
         mPresenter.create();
+        mGlide = SpyurApplication.getComponent().getGlide();
+    }
 
-        supportPostponeEnterTransition();
-        // Using setEnterSharedElementCallback, which is being called for return transition too.
-        setEnterSharedElementCallback(mPresenter.provideSharedElementCallback());
-        getWindow().getEnterTransition().addListener(new AnimUtils.TransitionListenerAdapter(){
+    @Override
+    public void addListenerToEnterTransition() {
+        getWindow().getEnterTransition().addListener(new AnimUtils.TransitionListenerAdapter() {
             @Override public void onTransitionEnd(Transition transition) {
                 super.onTransitionEnd(transition);
 
@@ -230,144 +165,117 @@ public class ListingActivity extends RxBaseActivity implements ListingContract.V
                 mPresenter.retrieveListingData();
             }
         });
+    }
 
-        mGlide = SpyurApplication.getComponent().getGlide();
+    @Override public void delegatePostponeEnterTransition() {
+        supportPostponeEnterTransition();
+    }
 
-        analyzeLogo();
+    @Override public void delegateSetEnterSharedElementCallback(SharedElementCallback callback) {
+        // Using setEnterSharedElementCallback, which is being called for return transition too.
+        setEnterSharedElementCallback(callback);
+    }
 
-        mTransitionInflater = TransitionInflater.from(this);
-        mConnectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+    @Override public void setTitle(String title) {
+        titleTextView.setText(title);
+    }
 
-        mainCardAutoTransition = mTransitionInflater.inflateTransition(R.transition.main_card);
-        mainCardAutoTransition.addListener(new AnimUtils.TransitionListenerAdapter() {
+    @Override public void setCollapsingToolbarTitle(String title) {
+        collapsingToolbarLayout.setTitle(title);
+    }
 
-            @Override
-            public void onTransitionStart(Transition transition) {
-                mIsAutoTransitionRunning = true;
-            }
-
-            @Override
-            public void onTransitionEnd(Transition transition) {
-                mIsAutoTransitionRunning = false;
-                setupImagesAndVideo(mListingResponse.images, mListingResponse.videoUrl);
-            }
-        });
-
-        toolbar.setOnTouchListener(mOnToolbarTouchListener);
-        back.setOnClickListener(v -> onBackPressed());
-        appBarLayout.addOnOffsetChangedListener(mAppBarStateChangeListener);
-        titleTextView.setText(mSearchItem.getTitle());
-        collapsingToolbarLayout.setTitle(mSearchItem.getTitle());
-        collapsingToolbarLayout.setExpandedTitleColor(transparentColor);
+    @Override public void setExpandedTitleColor(@ColorInt int color) {
+        collapsingToolbarLayout.setExpandedTitleColor(color);
     }
 
     @Override
-    public void analyzeLogo(SearchItem searchItem) {
+    public void setAppBarStateChangeListener(AppBarStateChangeListener appBarStateChangeListener) {
+        appBarLayout.addOnOffsetChangedListener(appBarStateChangeListener);
+    }
+
+    @OnClick({R.id.back}) @SuppressWarnings("unused")
+    public void onBackClicked() {
+        onBackPressed();
+    }
+
+    @Override
+    public void analyzeLogo(SearchItem searchItem, RequestListener<String, Bitmap> glideListener) {
         mGlide
                 .load(searchItem.getLogo())
                 .asBitmap()
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                 .priority(Priority.IMMEDIATE)
-                .listener(new RequestListener<String, Bitmap>() {
-                    @Override
-                    public boolean onException(Exception e, String model, Target<Bitmap> target,
-                                               boolean isFirstResource) {
-                        supportStartPostponedEnterTransition();
-                        return false;
-                    }
-
-                    @Override
-                    public boolean onResourceReady(Bitmap resource, String model, Target<Bitmap> target,
-                                                   boolean isFromMemoryCache, boolean isFirstResource) {
-
-                        int[] loc = new int[2];
-                        logoCard.getLocationOnScreen(loc);
-                        mPresenter.onResourceReady(resource, loc, logoCard.getWidth(),
-                                logoCard.getHeight(), headerLayout.getWidth(),
-                                headerLayout.getHeight());
-                        return false;
-                    }
-                })
+                .listener(glideListener)
                 .into(logo);
+    }
+
+    @Override public int[] getLogoCardSizes() {
+        int[] loc = new int[2];
+        logo.getLocationOnScreen(loc);
+        return new int[]{loc[0], loc[1], logoCard.getWidth(), logoCard.getHeight()};
+    }
+
+    @Override public int[] getHeadLayoutSizes() {
+        return new int[]{logoCard.getHeight(), headerLayout.getWidth()};
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (mIsRetrievalPending) retrieveData(mSearchItem.getHref());
-        setSliderAutoScroll(true);
+
+        mPresenter.resume();
     }
 
     @OnClick({R.id.logo_map})
     public void onLogoClicked(View v) {
-        MapActivity.launch(this, mListingResponse);
+        mPresenter.dispatchLogoClick();
+    }
+
+    @Override public void launchMapActivity(ListingResponse listingResponse) {
+        MapActivity.launch(this, listingResponse);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (mIsMonitoringConnectivity) {
-            mConnectivityManager.unregisterNetworkCallback(mConnectivityCallback);
-            mIsMonitoringConnectivity = false;
-        }
-        unsubscribe();
-        if (isFinishing() && null != mYoutubePlayer) {
-            mYoutubePlayer.pause();
-            mYoutubePlayer.release();
-            getFragmentManager().beginTransaction().remove(youTubePlayerFragment).commit();
-        }
+
+        mPresenter.pause();
     }
 
     @Override
     protected void onStop() {
-        setSliderAutoScroll(false);
         super.onStop();
+
+        mPresenter.stop();
     }
 
     @Override
     public void onBackPressed() {
-        mOnBackPressed = true;
-        ActivityCompat.finishAfterTransition(this);
+        mPresenter.onBackPressed();
+    }
+
+    @Override public void finish(boolean afterTransition) {
+        if (afterTransition) ActivityCompat.finishAfterTransition(this);
+        else finish();
     }
 
     @Override
     public void finishAfterTransition() {
-        if (mIsAutoTransitionRunning) return;
-        if (null != mImagesAndVideoTransition && !mIsImagesAndVideoTransitionEnded) return;
+        if (!mPresenter.allowToFinish()) return;
         setResult(RESULT_OK, null);
         super.finishAfterTransition();
     }
 
     @Override
-    public void showProgressBar(boolean show) {
+    public void showProgressBar(boolean show, int color) {
         if (show) {
-            progressBar.getIndeterminateDrawable().setColorFilter(mPaletteVibrant,
+            progressBar.getIndeterminateDrawable().setColorFilter(color,
                     android.graphics.PorterDuff.Mode.SRC_ATOP);
             progressBarLayout.setVisibility(View.VISIBLE);
         } else progressBarLayout.setVisibility(View.GONE);
     }
 
-    /**
-     * Sets up all the content info.
-     */
-    private void setupContent(ListingResponse listingResponse) {
-        if (!isHeaderCardEmpty(listingResponse)) {
-            setupExecutives(listingResponse.executives);
-            setupContactInfo(listingResponse.contactInfos);
-            setupWebsites(listingResponse.websites);
-            setupListingInSpyur(listingResponse.listingInSpyur);
-            showProgressBar(false);
-            TransitionManager.beginDelayedTransition(nestedScrollView, mainCardAutoTransition);
-            cardListingLayout.setVisibility(View.VISIBLE);
-        } else {
-            TransitionManager.beginDelayedTransition(nestedScrollView, mainCardAutoTransition);
-            emptyListingViewStub.inflate();
-            showProgressBar(false);
-        }
-        setupMap(listingResponse);
-    }
-
-    private void setupExecutives(List<String> executives) {
+    @Override public void setupExecutives(List<String> executives) {
         int executiveSize = executives.size();
         String executiveString = getResources().getQuantityString(R.plurals.executive, executiveSize);
         executivesTextView.setText(executiveString);
@@ -385,7 +293,7 @@ public class ListingActivity extends RxBaseActivity implements ListingContract.V
         }
     }
 
-    private void setupContactInfo(List<ListingResponse.ContactInfo> contactInfoList) {
+    @Override public void setupContactInfo(List<ListingResponse.ContactInfo> contactInfoList) {
         int contactInfoListSize = contactInfoList.size();
         if (contactInfoListSize == 0) {
             contactInfoTextView.setVisibility(View.GONE);
@@ -430,7 +338,7 @@ public class ListingActivity extends RxBaseActivity implements ListingContract.V
         }
     }
 
-    private void setupWebsites(List<String> websiteList) {
+    @Override public void setupWebsites(List<String> websiteList) {
         int websiteSize = websiteList.size();
         if (websiteSize == 0) {
             websiteTextView.setVisibility(View.GONE);
@@ -444,23 +352,18 @@ public class ListingActivity extends RxBaseActivity implements ListingContract.V
         }
     }
 
-    private void setupMap(ListingResponse listingResponse) {
-        if (listingResponse.hasMapCoordinates) {
-            if (mAppBarState == EXPANDED) animateMapLogo();
-            else mIsMapAnimPending = true;
-        }
-    }
-
-    private void setupListingInSpyur(String listingInSpyur) {
+    @Override public void setupListingInSpyur(String listingInSpyur) {
         if (TextUtils.isEmpty(listingInSpyur)) {
             listingInSpyurTextView.setVisibility(View.GONE);
             listingInSpyurUrlTextView.setVisibility(View.GONE);
-        } else {
-            listingInSpyurUrlTextView.setText(listingInSpyur);
-        }
+        } else listingInSpyurUrlTextView.setText(listingInSpyur);
     }
 
-    private void setupImagesAndVideo(List<String> imagesList, String videoId) {
+    @Override
+    public void setupImagesAndVideo(List<String> imagesList, String videoId,
+                                    @Nullable Transition transition,
+                                    YouTubePlayer.OnInitializedListener youtubeInitializedListener) {
+
         View imagesCard = null, videoCard = null;
         if (null != imagesList && imagesList.size() > 0) {
             FrameLayout imagesSlideCardRoot = (FrameLayout) imagesViewStub.inflate()
@@ -485,8 +388,8 @@ public class ListingActivity extends RxBaseActivity implements ListingContract.V
         if (!TextUtils.isEmpty(videoId)) {
             FrameLayout videoCardRoot = (FrameLayout) videoViewStub.inflate()
                     .findViewById(R.id.listing_card_youtube_root);
-            youTubePlayerFragment = new YouTubePlayerFragment();
-            youTubePlayerFragment.initialize(Constants.YOUTUBE_API_KEY, this);
+            YouTubePlayerFragment youTubePlayerFragment = new YouTubePlayerFragment();
+            youTubePlayerFragment.initialize(Constants.YOUTUBE_API_KEY, youtubeInitializedListener);
             getFragmentManager().beginTransaction().add(R.id.youtube_fragment, youTubePlayerFragment,
                     TAG_YOUTUBE).commit();
 
@@ -494,173 +397,47 @@ public class ListingActivity extends RxBaseActivity implements ListingContract.V
         }
 
         if (!(null == imagesCard && null == videoCard)) {
-            if (null == imagesCard) {
-                mImagesAndVideoTransition = mTransitionInflater
-                        .inflateTransition(R.transition.video_card);
-            } else {
-                mImagesAndVideoTransition = mTransitionInflater
-                        .inflateTransition(R.transition.image_video_card);
-            }
-            mImagesAndVideoTransition.addListener(new AnimUtils.TransitionListenerAdapter() {
-                @Override
-                public void onTransitionEnd(Transition transition) {
-                    super.onTransitionEnd(transition);
-                    if (!isFinishing() && null != mSliderLayout) mSliderLayout.startAutoCycle();
-                    mIsImagesAndVideoTransitionEnded = true;
-                }
-            });
-            mImagesAndVideoTransition.setInterpolator(AnimUtils.getFastOutSlowInInterpolator(this));
-            TransitionManager.beginDelayedTransition(cardRoot, mImagesAndVideoTransition);
+            TransitionManager.beginDelayedTransition(cardRoot, transition);
             if (null != imagesCard) imagesCard.setVisibility(View.VISIBLE);
             if (null != videoCard) videoCard.setVisibility(View.VISIBLE);
         }
     }
 
-    /**
-     * Shows map icon with animation.
-     */
-    private void animateMapLogo() {
-        mIsMapAnimPending = false;
-        mapLogo.setVisibility(View.VISIBLE);
-        mapLogo.setScaleX(0);
-        mapLogo.setScaleY(0);
-        mapLogo.animate()
-                .scaleX(1)
-                .scaleY(1)
-                .setStartDelay(500)
-                .setDuration(400)
-                .setInterpolator(AnimUtils.getOvershootInterpolator(this))
-                .withEndAction(() -> {
-                    if (isAppBarExpanded()) saveMapIconCoordinates();
-                    else mIsMapIconCoordinatesSavingPending = true;
-                });
-    }
-
-    @Override
-    public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer youTubePlayer,
-                                        boolean wasRestored) {
-        mYoutubePlayer = youTubePlayer;
-        if (!wasRestored) {
-            youTubePlayer.cueVideo(mListingResponse.videoUrl);
-            youTubePlayer.setShowFullscreenButton(false);
+    @Override public void removeYoutubeFragment() {
+        Fragment fr = FragmentUtils.findByTag(this, TAG_YOUTUBE);
+        if (null != fr) {
+            getSupportFragmentManager().beginTransaction().remove(fr).commit();
         }
     }
 
-    @Override
-    public void onInitializationFailure(YouTubePlayer.Provider provider,
-                                        YouTubeInitializationResult errorReason) {
-        if (errorReason.isUserRecoverableError()) {
-            errorReason.getErrorDialog(this, YOUTUBE_RECOVERY_DIALOG_REQUEST).show();
-        } else {
-            String errorMessage = String.format(getString(R.string.error_youtube),
-                    errorReason.toString());
-            Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
-        }
+    @Override public boolean isActivityFinishing() {
+        return isFinishing();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == YOUTUBE_RECOVERY_DIALOG_REQUEST) {
-            // Retry initialization if user performed a recovery action
-            ((YouTubePlayerFragment) getFragmentManager().findFragmentById(R.id.youtube_fragment))
-                    .initialize(Constants.YOUTUBE_API_KEY, this);
+        if (!mPresenter.onActivityResult(requestCode, resultCode, data)) {
+            super.onActivityResult(requestCode, resultCode, data);
         }
     }
 
-    /**
-     * Sets the {@code mSliderLayout} auto scroll status.
-     *
-     * @param autoScroll If true - images would be auto scrolled. False otherwise.
-     */
-    private void setSliderAutoScroll(boolean autoScroll) {
+    @Override
+    public void initYoutubeFragment(String youtubeApiKey, YouTubePlayer.OnInitializedListener listener) {
+        // Retry initialization if user performed a recovery action
+        ((YouTubePlayerFragment) getFragmentManager().findFragmentById(R.id.youtube_fragment))
+                .initialize(youtubeApiKey, listener);
+    }
+
+    @Override
+    public void showYoutubeErrorReason(YouTubeInitializationResult errorReason, int requestCode) {
+        errorReason.getErrorDialog(this, requestCode).show();
+    }
+
+    @Override public void setSliderAutoScroll(boolean autoScroll) {
         if (null == mSliderLayout) return;
         if (autoScroll) mSliderLayout.startAutoCycle();
         else mSliderLayout.stopAutoCycle();
     }
-
-    /**
-     * @return True if the content of the header item is empty. False otherwise.
-     */
-    private boolean isHeaderCardEmpty(ListingResponse listingResponse) {
-        return !(listingResponse.executives.size() > 0
-                || listingResponse.contactInfos.size() > 0
-                || listingResponse.websites.size() > 0
-                || !TextUtils.isEmpty(listingResponse.listingInSpyur));
-    }
-
-    // Callbacks & listeners
-
-    /**
-     * Is responsible for handling connectivity changes properly.
-     */
-    private final ConnectivityManager.NetworkCallback mConnectivityCallback
-            = new ConnectivityManager.NetworkCallback() {
-        @Override
-        public void onAvailable(Network network) {
-            runOnUiThread(() -> {
-                if (mIsRetrievalPending) retrieveData(mSearchItem.getHref());
-            });
-        }
-
-        @Override
-        public void onLost(Network network) {
-        }
-    };
-
-    /**
-     * Tracks for collapse state of {@code collapsingToolbarLayout}. If is expanded animates the
-     * logo back to previous activity, otherwise does not perform back shared element transition.
-     */
-    private final AppBarStateChangeListener mAppBarStateChangeListener
-            = new AppBarStateChangeListener() {
-        @Override
-        public void onStateChanged(AppBarLayout appBarLayout, @AppBarState int
-                appBarState) {
-            mAppBarState = appBarState;
-            if (isAppBarExpanded()) {
-                if (mIsMapAnimPending) animateMapLogo();
-                if (mIsMapIconCoordinatesSavingPending) saveMapIconCoordinates();
-            }
-        }
-    };
-
-    /**
-     * Retains map icon's coordinates in order to handle click events, because it's beneath toolbar.
-     */
-    private void saveMapIconCoordinates() {
-        int[] loc = new int[2];
-        mapLogo.getLocationOnScreen(loc);
-        mMapLogoRect = new Rect(loc[0], loc[1], loc[0] + mapLogo.getWidth(), loc[1] + mapLogo.getHeight());
-        mIsMapIconCoordinatesSavingPending = false;
-    }
-
-    /**
-     * @return True if {@link CollapsingToolbarLayout} is fully expanded. False otherwise.
-     */
-    private boolean isAppBarExpanded() {
-        return mAppBarState == EXPANDED;
-    }
-
-    /**
-     * Dispatches click event from toolbar to map icon, because map icon is beneath the toolbar.
-     */
-    private final View.OnTouchListener mOnToolbarTouchListener = new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View view, MotionEvent motionEvent) {
-            int action = motionEvent.getActionMasked();
-            if (mMapLogoRect != null && (action == MotionEvent.ACTION_DOWN
-                    || action == MotionEvent.ACTION_UP
-                    || action == MotionEvent.ACTION_CANCEL)) {
-                if (mMapLogoRect.contains((int) motionEvent.getRawX(), (int) motionEvent.getRawY())) {
-                    mapLogo.dispatchTouchEvent(motionEvent);
-                }
-            }
-            return false;
-        }
-    };
-
-    //////////////////////////////
-
 
     @Override public void delegateAddSubscription(Subscription s) {
         addSubscription(s);
@@ -671,7 +448,7 @@ public class ListingActivity extends RxBaseActivity implements ListingContract.V
     }
 
     @Override public int[] measureLogoBackground(int widthMode, int heightMode) {
-        logoBackground.measure(widthMode, heightMode)
+        logoBackground.measure(widthMode, heightMode);
         return new int[]{logoBackground.getMeasuredWidth(), logoBackground.getMeasuredHeight()};
     }
 
@@ -712,4 +489,56 @@ public class ListingActivity extends RxBaseActivity implements ListingContract.V
     @Override public void showToast(@StringRes int message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
+
+    @Override public void beginScrollViewTransition(Transition transition) {
+        TransitionManager.beginDelayedTransition(nestedScrollView, transition);
+    }
+
+    @Override public Transition inflateTransition(@TransitionRes int transitionId) {
+        return TransitionInflater.from(this).inflateTransition(transitionId);
+    }
+
+    @Override public void showCardListingLayout(boolean show) {
+        cardListingLayout.setVisibility(show ? View.VISIBLE : View.GONE);
+    }
+
+    @Override public void inflateEmptyListing() {
+        emptyListingViewStub.inflate();
+    }
+
+    @Override public void animateMapLogo(Runnable endAction) {
+        mapLogo.setVisibility(View.VISIBLE);
+        mapLogo.setScaleX(0);
+        mapLogo.setScaleY(0);
+        mapLogo.animate()
+                .scaleX(1)
+                .scaleY(1)
+                .setStartDelay(500)
+                .setDuration(400)
+                .setInterpolator(AnimUtils.getOvershootInterpolator(this))
+                .withEndAction(endAction);
+    }
+
+    @Override public Rect getMapLogoRect() {
+        int[] loc = new int[2];
+        mapLogo.getLocationOnScreen(loc);
+        return new Rect(loc[0], loc[1], loc[0] + mapLogo.getWidth(), loc[1] + mapLogo.getHeight());
+    }
+
+    @Override public void delegateRunOnUiThread(Runnable runnable) {
+        runOnUiThread(runnable);
+    }
+
+    @Override public ConnectivityManager provideConnectivityManager() {
+        return (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+    }
+
+    @Override public void dispatchMapLogoTouchEvent(MotionEvent motionEvent) {
+        mapLogo.dispatchTouchEvent(motionEvent);
+    }
+
+    @Override public void setToolbarTouchListener(View.OnTouchListener onTouchListener) {
+        toolbar.setOnTouchListener(onTouchListener);
+    }
+
 }

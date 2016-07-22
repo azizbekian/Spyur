@@ -22,7 +22,7 @@ public class ListingModel implements ListingContract.Model {
         mApiInteractor = SpyurApplication.getComponent().getApiInteractor();
     }
 
-    @CheckResult public Observable<ListingResponse> a(String href) {
+    @Override @CheckResult public Observable<ListingResponse> getListing(String href) {
         return mApiInteractor.getListing(href);
     }
 

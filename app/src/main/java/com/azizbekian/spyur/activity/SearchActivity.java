@@ -189,4 +189,9 @@ public class SearchActivity extends RxBaseActivity implements SearchContract.Vie
     private boolean isItemFullyVisible(int position) {
         return mLayoutManager.findFirstCompletelyVisibleItemPosition() <= position;
     }
+
+    @Override public boolean delegateHasSubscriptions() {
+        return hasSubscriptions();
+    }
+
 }
