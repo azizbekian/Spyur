@@ -45,7 +45,6 @@
 
         <activity
             android:name=".activity.MapActivity"
-            android:configChanges="keyboardHidden|orientation"
             android:theme="@style/Spyur.Map"/>
 
         <meta-data

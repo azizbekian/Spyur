@@ -1,5 +1,6 @@
 package com.azizbekian.spyur.utils;
 
+import android.support.design.BuildConfig;
 import android.util.Log;
 
 /**
@@ -11,19 +12,22 @@ public class LogUtils {
 
     private static final String PREFIX = "vvv";
 
+    private static final boolean IS_DEBUGGABLE = BuildConfig.DEBUG;
+
     private LogUtils() {
+        throw new RuntimeException("Unable to instantiate class " + getClass().getCanonicalName());
     }
 
     public static void wtf(String msg) {
-        Log.wtf(PREFIX, msg);
+        if (IS_DEBUGGABLE) Log.wtf(PREFIX, msg);
     }
 
     public static void i(String msg) {
-        Log.i(PREFIX, msg);
+        if (IS_DEBUGGABLE) Log.i(PREFIX, msg);
     }
 
     public static void e(String msg) {
-        Log.e(PREFIX, msg);
+        if (IS_DEBUGGABLE) Log.wtf(PREFIX, msg);
     }
 
     public static void wtf(int msg) {

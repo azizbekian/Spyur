@@ -136,4 +136,5 @@ public class ForegroundRelativeLayout extends RelativeLayout {
             foreground.setHotspot(x, y);
         }
     }
+
 }

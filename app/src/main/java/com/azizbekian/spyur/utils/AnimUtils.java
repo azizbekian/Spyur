@@ -16,7 +16,9 @@ import android.view.animation.Interpolator;
  */
 public class AnimUtils {
 
-    private AnimUtils() { }
+    private AnimUtils() {
+        throw new RuntimeException("Unable to instantiate class " + getClass().getCanonicalName());
+    }
 
     private static Interpolator fastOutSlowIn;
     private static Interpolator overshoot;

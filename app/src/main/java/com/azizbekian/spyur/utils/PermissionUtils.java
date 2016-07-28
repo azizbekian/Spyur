@@ -37,9 +37,13 @@ import com.azizbekian.spyur.R;
 /**
  * Utility class for access to runtime permissions.
  *
- * @author  Nick Butcher
+ * @author Nick Butcher
  */
 public abstract class PermissionUtils {
+
+    private PermissionUtils() {
+        throw new RuntimeException("Unable to instantiate class " + getClass().getCanonicalName());
+    }
 
     /**
      * Requests the fine location permission. If a rationale with an additional explanation should
@@ -214,4 +218,5 @@ public abstract class PermissionUtils {
             }
         }
     }
+
 }

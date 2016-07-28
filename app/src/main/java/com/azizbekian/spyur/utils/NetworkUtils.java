@@ -11,10 +11,14 @@ import android.net.NetworkInfo;
  */
 public class NetworkUtils {
 
+    private NetworkUtils() {
+        throw new RuntimeException("Unable to instantiate class " + getClass().getCanonicalName());
+    }
+
     /**
      * @return true - if there is a network connection. False otherwise.
      */
-    public static boolean isNetworkAvailable(Context context) {
+    public static boolean isConnected(Context context) {
         ConnectivityManager connectivityManager = (ConnectivityManager) context
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();

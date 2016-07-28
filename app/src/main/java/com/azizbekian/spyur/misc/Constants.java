@@ -1,7 +1,7 @@
 package com.azizbekian.spyur.misc;
 
 /**
- * Created by CargoMatrix, Inc. on May 02, 2016.
+ * Created on May 09, 2016.
  *
  * @author Andranik Azizbekian (andranik.azizbekyan@gmail.com)
  */

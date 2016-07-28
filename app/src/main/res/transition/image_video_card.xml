@@ -1,17 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <transitionSet xmlns:android="http://schemas.android.com/apk/res/android"
-               android:transitionOrdering="sequential">
+    android:transitionOrdering="sequential">
+
     <targets>
-        <target android:excludeId="@id/card1"/>
+        <target android:excludeId="@id/card1" />
     </targets>
+
     <slide android:slideEdge="bottom">
         <targets>
-            <target android:targetId="@id/listing_card_image"/>
+            <target android:targetId="@id/listing_card_image" />
         </targets>
     </slide>
+
     <slide android:slideEdge="bottom">
         <targets>
-            <target android:targetId="@id/listing_card_video"/>
+            <target android:targetId="@id/listing_card_video" />
         </targets>
     </slide>
+
 </transitionSet>

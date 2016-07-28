@@ -2,12 +2,12 @@ package com.azizbekian.spyur.injection;
 
 import android.content.Context;
 
+import com.azizbekian.spyur.api.ApiInteractor;
 import com.bumptech.glide.RequestManager;
 
 import javax.inject.Singleton;
 
 import com.azizbekian.spyur.activity.ListingActivity;
-import com.azizbekian.spyur.manager.SpyurManager;
 
 import dagger.Component;
 
@@ -22,22 +22,18 @@ import dagger.Component;
 public interface AppComponent {
 
     /**
-     * Injects all the fields from object graph.
-     */
-    void inject(ListingActivity listingActivity);
-
-    /**
      * @return {@link com.azizbekian.spyur.SpyurApplication SpyurApplication} context.
      */
-    Context getApplicationContext();
+     Context getApplicationContext();
 
     /**
-     * @return Singleton {@link SpyurManager} instance.
+     * @return Singleton {@link ApiInteractor} instance.
      */
-    SpyurManager getSpyurManager();
+     ApiInteractor getApiInteractor();
 
     /**
      * @return Singleton {@link RequestManager} instance.
      */
-    RequestManager getGlide();
+     RequestManager getGlide();
+
 }

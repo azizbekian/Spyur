@@ -18,11 +18,13 @@ public class NpaLinearLayoutManager extends LinearLayoutManager {
         super(context);
     }
 
+    @SuppressWarnings("unused")
     public NpaLinearLayoutManager(Context context, AttributeSet attrs, int defStyleAttr,
                                   int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 
+    @SuppressWarnings("unused")
     public NpaLinearLayoutManager(Context context, int orientation, boolean reverseLayout) {
         super(context, orientation, reverseLayout);
     }

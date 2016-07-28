@@ -2,32 +2,40 @@ package com.azizbekian.spyur.manager;
 
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringDef;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.Locale;
 
+import com.azizbekian.spyur.api.ApiInteractor;
 import com.azizbekian.spyur.misc.LanguageType;
 import com.azizbekian.spyur.model.ListingResponse;
 import com.azizbekian.spyur.model.SearchResponse;
 import com.azizbekian.spyur.rest.SpyurApi;
-import com.azizbekian.spyur.rest.SpyurApi.ListingApi;
-import com.azizbekian.spyur.rest.SpyurApi.SearchApi;
+
+import javax.inject.Inject;
 
 import retrofit2.Call;
+import rx.Observable;
 
 /**
  * Created on May 09, 2016.
  *
  * @author Andranik Azizbekian (andranik.azizbekyan@gmail.com)
  */
-public class SpyurManager {
+public class SpyurManager implements ApiInteractor {
 
-    private SearchApi mSearchApi;
-    private ListingApi mListingApi;
+    private SpyurApi.SearchApi mSearchApi;
+    private SpyurApi.ListingApi mListingApi;
     private @LanguageType String mLang;
 
-    public SpyurManager(SearchApi searchApi, ListingApi listingApi) {
+    @Inject
+    public SpyurManager(SpyurApi.SearchApi searchApi, SpyurApi.ListingApi listingApi) {
+
         mSearchApi = searchApi;
         mListingApi = listingApi;
+
         switch (Locale.getDefault().getLanguage()) {
             case "en":
                 mLang = SpyurApi.EN;
@@ -42,14 +50,18 @@ public class SpyurManager {
                 mLang = SpyurApi.EN;
                 break;
         }
+
     }
 
-    public Call<SearchResponse> search(@IntRange(from = 1, to = Integer.MAX_VALUE) int page,
-                                       @NonNull String query) {
+    @Override
+    public Observable<SearchResponse> search(@IntRange(from = 1, to = Integer.MAX_VALUE) int page,
+                                             @NonNull String query) {
+
         return mSearchApi.search(mLang, page, query);
     }
 
-    public Call<ListingResponse> getListing(String href) {
+    @Override
+    public Observable<ListingResponse> getListing(@NonNull String href) {
         return mListingApi.getListing(href);
     }
 

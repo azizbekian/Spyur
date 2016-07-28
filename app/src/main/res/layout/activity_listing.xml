@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -8,16 +7,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".activity.ListingActivity"
-    >
+    tools:context=".activity.ListingActivity">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fitsSystemWindows="true"
-        android:theme="@style/AppBarLayout.Listing"
-        >
+        android:theme="@style/AppBarLayout.Listing">
 
         <android.support.design.widget.CollapsingToolbarLayout
             android:id="@+id/collapsing_toolbar"
@@ -28,22 +25,20 @@
             app:contentScrim="?attr/colorPrimary"
             app:expandedTitleMarginEnd="@dimen/ctl_expand_end"
             app:expandedTitleMarginStart="@dimen/ctl_expand_start"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
-            >
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
 
             <FrameLayout
                 android:id="@+id/header_frame"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:fitsSystemWindows="true"
-                >
+                android:fitsSystemWindows="true">
 
                 <ImageView
                     android:id="@+id/listing_header_background"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:contentDescription="@null"
-                    android:visibility="gone"/>
+                    android:visibility="gone" />
 
                 <RelativeLayout
                     android:layout_width="wrap_content"
@@ -51,20 +46,17 @@
                     android:layout_gravity="bottom"
                     android:layout_marginBottom="@dimen/spacing_big"
                     android:layout_marginEnd="@dimen/spacing_normal"
-                    android:layout_marginStart="@dimen/listing_header_margin"
-                    >
+                    android:layout_marginStart="@dimen/listing_header_margin">
 
                     <android.support.v7.widget.CardView
                         android:id="@+id/logo_card_view"
                         style="@style/LogoCard"
-                        card_view:cardBackgroundColor="@android:color/white"
-                        >
+                        card_view:cardBackgroundColor="@android:color/white">
 
                         <FrameLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:padding="@dimen/spacing_tiny"
-                            >
+                            android:padding="@dimen/spacing_tiny">
 
                             <ImageView
                                 android:id="@+id/logo_background"
@@ -73,8 +65,7 @@
                                 android:layout_gravity="center"
                                 android:background="@android:color/transparent"
                                 android:contentDescription="@null"
-                                android:transitionName="@string/transition.logo"
-                                />
+                                android:transitionName="@string/transition.logo" />
 
                         </FrameLayout>
                     </android.support.v7.widget.CardView>
@@ -94,8 +85,7 @@
                         android:paddingEnd="0dp"
                         android:paddingStart="@dimen/spacing_smaller"
                         tools:ignore="symmetry"
-                        tools:text="Company name"
-                        />
+                        tools:text="Company name" />
 
                 </RelativeLayout>
 
@@ -110,8 +100,7 @@
                     android:contentDescription="@null"
                     android:src="@drawable/map"
                     android:visibility="gone"
-                    tools:visibility="visible"
-                    />
+                    tools:visibility="visible" />
 
             </FrameLayout>
 
@@ -121,8 +110,7 @@
                 android:layout_height="?attr/actionBarSize"
                 android:background="@android:color/transparent"
                 app:layout_collapseMode="pin"
-                app:popupTheme="@style/ToolbarPopup.Listing"
-                >
+                app:popupTheme="@style/ToolbarPopup.Listing">
 
                 <ImageButton
                     android:id="@+id/back"
@@ -130,8 +118,7 @@
                     android:layout_height="match_parent"
                     android:background="@drawable/mid_grey_ripple"
                     android:contentDescription="@null"
-                    android:src="@drawable/ic_arrow_back"
-                    />
+                    android:src="@drawable/ic_arrow_back" />
 
             </android.support.v7.widget.Toolbar>
 
@@ -153,45 +140,38 @@
             android:id="@+id/listing_cards"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            >
+            android:orientation="vertical">
 
             <FrameLayout
                 android:id="@+id/card1"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                >
+                android:layout_height="wrap_content">
 
                 <android.support.v7.widget.CardView
                     android:id="@+id/listing_content_card"
-                    style="@style/ListingCard.MainInfo"
-                    >
+                    style="@style/ListingCard.MainInfo">
 
                     <FrameLayout
                         android:id="@+id/card_content_wrapper"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        >
+                        android:layout_height="wrap_content">
 
                         <include
                             layout="@layout/card_listing"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            />
+                            android:layout_height="wrap_content" />
 
                         <FrameLayout
                             android:id="@+id/listing_content_progress_frame"
                             android:layout_width="match_parent"
                             android:layout_height="@dimen/card_placeholder_height"
-                            android:visibility="gone"
-                            >
+                            android:visibility="gone">
 
                             <ProgressBar
                                 android:id="@+id/listing_content_progress"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                />
+                                android:layout_gravity="center" />
 
                         </FrameLayout>
 
@@ -199,27 +179,25 @@
                             android:id="@+id/viewstub_empty_listing"
                             android:layout_width="match_parent"
                             android:layout_height="@dimen/card_placeholder_height"
-                            android:layout="@layout/viewstub_empty_listing"
-                            />
+                            android:layout="@layout/viewstub_empty_listing" />
 
                     </FrameLayout>
 
                 </android.support.v7.widget.CardView>
+
             </FrameLayout>
 
             <ViewStub
                 android:id="@+id/viewstub_images_slider"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout="@layout/card_image"
-                />
+                android:layout="@layout/card_image" />
 
             <ViewStub
                 android:id="@+id/viewstub_youtube"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout="@layout/card_youtube"
-                />
+                android:layout="@layout/card_youtube" />
 
         </LinearLayout>
 
