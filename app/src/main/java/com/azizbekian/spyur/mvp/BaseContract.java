@@ -71,6 +71,13 @@ public interface BaseContract {
 
     }
 
+    interface RxPresenter extends Presenter {
+        /**
+         * Adds the {@link Subscription} to the list of subscriptions.
+         */
+        void addSubscription(Subscription subscription);
+    }
+
     interface RxView extends View {
 
         /**

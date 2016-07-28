@@ -9,6 +9,7 @@ import android.text.SpannableStringBuilder;
 import android.transition.Transition;
 
 import com.azizbekian.spyur.listener.IRecyclerLoadingListener;
+import com.azizbekian.spyur.model.ListingResponse;
 import com.azizbekian.spyur.model.SearchResponse;
 import com.azizbekian.spyur.model.SearchResponse.SearchItem;
 import com.jakewharton.rxbinding.widget.SearchViewQueryTextEvent;
@@ -62,7 +63,7 @@ public interface SearchContract {
         void launchListing(android.view.View logo, SearchItem searchItem, int position);
     }
 
-    interface Presenter extends BaseContract.Presenter {
+    interface Presenter extends BaseContract.RxPresenter {
 
         void performSearch();
 
@@ -73,10 +74,14 @@ public interface SearchContract {
         void newIntent(Intent intent);
 
         void dispatchItemClicked(android.view.View logo, SearchItem searchItem, int position);
+
+        void onDataSuccess(SearchResponse searchResponse);
+
+        void onDataFailure(Throwable e);
     }
 
     interface Model extends BaseContract.Model {
 
-        @CheckResult Observable<SearchResponse> search(int page, String query);
+        void search(int page, String query);
     }
 }

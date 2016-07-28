@@ -5,8 +5,13 @@ import android.support.annotation.NonNull;
 import com.azizbekian.spyur.SpyurApplication;
 import com.azizbekian.spyur.api.ApiInteractor;
 import com.azizbekian.spyur.model.SearchResponse;
+import com.azizbekian.spyur.utils.LogUtils;
+import com.azizbekian.spyur.utils.RxUtils;
+
+import java.util.List;
 
 import rx.Observable;
+import rx.Subscriber;
 
 /**
  * Created on Jul 17, 2016.
@@ -15,15 +20,31 @@ import rx.Observable;
  */
 public class SearchModel implements SearchContract.Model {
 
+    @NonNull private SearchContract.Presenter mPresenter;
     @NonNull private ApiInteractor mApiInteractor;
 
-    public SearchModel() {
+    public SearchModel(@NonNull SearchContract.Presenter presenter) {
+        mPresenter = presenter;
         mApiInteractor = SpyurApplication.getComponent().getApiInteractor();
     }
 
     @Override
-    public Observable<SearchResponse> search(int page, String query) {
-        return mApiInteractor.search(page, query);
+    public void search(int page, String query) {
+        mPresenter.addSubscription(mApiInteractor.search(page, query)
+                .compose(RxUtils.applyIOtoMainThreadSchedulers())
+                .subscribe(new Subscriber<SearchResponse>() {
+                    @Override public void onCompleted() {
+
+                    }
+
+                    @Override public void onError(Throwable e) {
+                        mPresenter.onDataFailure(e);
+                    }
+
+                    @Override public void onNext(SearchResponse searchResponse) {
+                        mPresenter.onDataSuccess(searchResponse);
+                    }
+                }));
     }
 
 }

@@ -72,7 +72,8 @@ public class ListingContract {
 
         void setupImagesAndVideo(List<String> imagesList, String videoId,
                                  @Nullable Transition transition,
-                                 YouTubePlayer.OnInitializedListener youtubeInitializedListener);
+                                 YouTubePlayer.OnInitializedListener youtubeInitializedListener,
+                                 int sliderChangeDuration);
 
         void beginScrollViewTransition(Transition transition);
 
@@ -142,7 +143,7 @@ public class ListingContract {
         void addListenerToEnterTransition();
     }
 
-    public interface Presenter extends BaseContract.Presenter {
+    public interface Presenter extends BaseContract.RxPresenter {
 
         void imageReady(Bitmap resource, int[] logoCardLocationOnScreen,
                         int logoCardWidth, int logoCardHeight,
@@ -155,10 +156,14 @@ public class ListingContract {
         boolean allowToFinish();
 
         void dispatchLogoClick();
+
+        void onDataSuccess(ListingResponse listingResponse);
+
+        void onDataFailure(Throwable e);
     }
 
     public interface Model extends BaseContract.Model {
-        Observable<ListingResponse> getListing(String href);
+        void getListing(String href);
     }
 
 }

@@ -1,13 +1,16 @@
 package com.azizbekian.spyur.mvp.listing;
 
-import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 
 import com.azizbekian.spyur.SpyurApplication;
 import com.azizbekian.spyur.api.ApiInteractor;
 import com.azizbekian.spyur.model.ListingResponse;
+import com.azizbekian.spyur.utils.LogUtils;
+import com.azizbekian.spyur.utils.RxUtils;
 
-import rx.Observable;
+import rx.Subscriber;
+
+import static com.azizbekian.spyur.listener.AppBarStateChangeListener.EXPANDED;
 
 /**
  * Created on Jul 17, 2016.
@@ -16,14 +19,30 @@ import rx.Observable;
  */
 public class ListingModel implements ListingContract.Model {
 
+    @NonNull ListingContract.Presenter mPresenter;
     @NonNull ApiInteractor mApiInteractor;
 
-    public ListingModel() {
+    public ListingModel(@NonNull ListingContract.Presenter presenter) {
+        mPresenter = presenter;
         mApiInteractor = SpyurApplication.getComponent().getApiInteractor();
     }
 
-    @Override @CheckResult public Observable<ListingResponse> getListing(String href) {
-        return mApiInteractor.getListing(href);
+    @Override public void getListing(String href) {
+        mPresenter.addSubscription(mApiInteractor.getListing(href)
+                .compose(RxUtils.applyIOtoMainThreadSchedulers())
+                .subscribe(new Subscriber<ListingResponse>() {
+                    @Override public void onCompleted() {
+
+                    }
+
+                    @Override public void onError(Throwable e) {
+                        mPresenter.onDataFailure(e);
+                    }
+
+                    @Override public void onNext(ListingResponse listingResponse) {
+                        mPresenter.onDataSuccess(listingResponse);
+                    }
+                }));
     }
 
 }

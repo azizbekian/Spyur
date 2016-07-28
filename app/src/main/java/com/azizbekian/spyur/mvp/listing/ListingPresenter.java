@@ -35,7 +35,6 @@ import com.azizbekian.spyur.mvp.SimplePresenter;
 import com.azizbekian.spyur.utils.AnimUtils;
 import com.azizbekian.spyur.utils.LogUtils;
 import com.azizbekian.spyur.utils.NetworkUtils;
-import com.azizbekian.spyur.utils.RxUtils;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.google.android.youtube.player.YouTubeInitializationResult;
@@ -44,7 +43,7 @@ import com.google.android.youtube.player.YouTubePlayer;
 import java.util.List;
 import java.util.Map;
 
-import rx.Subscriber;
+import rx.Subscription;
 
 import static android.view.View.MeasureSpec.makeMeasureSpec;
 import static com.azizbekian.spyur.listener.AppBarStateChangeListener.EXPANDED;
@@ -59,10 +58,11 @@ public class ListingPresenter extends SimplePresenter implements ListingContract
 
     public static final String EXTRA_SEARCH_ITEM = "extra_search_item";
     private static final int DURATION_REVEAL = 1300;
+    private static final int DURATION_SLIDE_PAGE_CHANGE = 4000;
     private static final int YOUTUBE_RECOVERY_DIALOG_REQUEST = 821;
 
     @Nullable ListingContract.View mView;
-    private ListingContract.Model mModel = new ListingModel();
+    private ListingContract.Model mModel;
     private SearchItem mSearchItem;
     private ListingResponse mListingResponse;
     private Transition mMainCardAutoTransition;
@@ -124,6 +124,7 @@ public class ListingPresenter extends SimplePresenter implements ListingContract
     public ListingPresenter(@NonNull ListingContract.View view, Bundle extras) {
         this.mView = view;
 
+        mModel = new ListingModel(this);
         mSearchItem = extras.getParcelable(EXTRA_SEARCH_ITEM);
 
         Context context = SpyurApplication.getContext();
@@ -167,7 +168,8 @@ public class ListingPresenter extends SimplePresenter implements ListingContract
                         }
 
                         mView.setupImagesAndVideo(mListingResponse.images, mListingResponse.videoUrl,
-                                mImagesAndVideoTransition, mYoutubeInitializedListener);
+                                mImagesAndVideoTransition, mYoutubeInitializedListener,
+                                DURATION_SLIDE_PAGE_CHANGE);
                     }
                 }
             });
@@ -271,56 +273,54 @@ public class ListingPresenter extends SimplePresenter implements ListingContract
         }
     }
 
+    @Override public void onDataSuccess(ListingResponse listingResponse) {
+        mIsRetrievalPending = false;
+        mListingResponse = listingResponse;
+        if (verifyViewNotNull()) {
+            if (null != mListingResponse) {
+                mView.showProgressBar(false, mPaletteVibrant);
+
+                if (!isHeaderCardEmpty(listingResponse)) {
+                    mView.setupExecutives(listingResponse.executives);
+                    mView.setupContactInfo(listingResponse.contactInfos);
+                    mView.setupWebsites(listingResponse.websites);
+                    mView.setupListingInSpyur(listingResponse.listingInSpyur);
+                    mView.beginScrollViewTransition(mMainCardAutoTransition);
+                    mView.showCardListingLayout(true);
+                } else {
+                    mView.beginScrollViewTransition(mMainCardAutoTransition);
+                    mView.inflateEmptyListing();
+                }
+                if (listingResponse.hasMapCoordinates) {
+                    if (mAppBarState == EXPANDED) {
+                        mIsMapAnimPending = false;
+                        mView.animateMapLogo(mMapLogoAnimateEndRunnable);
+                    } else mIsMapAnimPending = true;
+                }
+            } else {
+                mView.showProgressBar(false, mPaletteVibrant);
+                LogUtils.e("Null response received when fetching listing.");
+            }
+        }
+    }
+
+    @Override public void onDataFailure(Throwable e) {
+        if (verifyViewNotNull()) mView.showProgressBar(false, mPaletteVibrant);
+        mIsRetrievalPending = false;
+        LogUtils.e("Failure loading listing: " + e.getMessage());
+    }
+
+    @Override public void addSubscription(Subscription subscription) {
+        if (!verifyViewNotNull()) return;
+        mView.delegateAddSubscription(subscription);
+    }
+
     @Override public void retrieveListingData() {
         if (!verifyViewNotNull()) return;
         if (NetworkUtils.isConnected(SpyurApplication.getContext()) && !mView.delegateHasSubscriptions()) {
             mView.showProgressBar(true, mPaletteVibrant);
 
-            mView.delegateAddSubscription(mModel.getListing(mSearchItem.getHref())
-                    .compose(RxUtils.applyIOtoMainThreadSchedulers())
-                    .subscribe(new Subscriber<ListingResponse>() {
-                        @Override public void onCompleted() {
-
-                        }
-
-                        @Override public void onError(Throwable e) {
-                            if (verifyViewNotNull()) mView.showProgressBar(false, mPaletteVibrant);
-                            mIsRetrievalPending = false;
-                            LogUtils.e("Failure loading listing: " + e.getMessage());
-                        }
-
-                        @Override public void onNext(ListingResponse listingResponse) {
-
-                            mIsRetrievalPending = false;
-                            mListingResponse = listingResponse;
-                            if (verifyViewNotNull()) {
-                                if (null != mListingResponse) {
-                                    mView.showProgressBar(false, mPaletteVibrant);
-
-                                    if (!isHeaderCardEmpty(listingResponse)) {
-                                        mView.setupExecutives(listingResponse.executives);
-                                        mView.setupContactInfo(listingResponse.contactInfos);
-                                        mView.setupWebsites(listingResponse.websites);
-                                        mView.setupListingInSpyur(listingResponse.listingInSpyur);
-                                        mView.beginScrollViewTransition(mMainCardAutoTransition);
-                                        mView.showCardListingLayout(true);
-                                    } else {
-                                        mView.beginScrollViewTransition(mMainCardAutoTransition);
-                                        mView.inflateEmptyListing();
-                                    }
-                                    if (listingResponse.hasMapCoordinates) {
-                                        if (mAppBarState == EXPANDED) {
-                                            mIsMapAnimPending = false;
-                                            mView.animateMapLogo(mMapLogoAnimateEndRunnable);
-                                        } else mIsMapAnimPending = true;
-                                    }
-                                } else {
-                                    mView.showProgressBar(false, mPaletteVibrant);
-                                    LogUtils.e("Null response received when fetching listing.");
-                                }
-                            }
-                        }
-                    }));
+            mModel.getListing(mSearchItem.getHref());
         } else {
             mView.showProgressBar(false, mPaletteVibrant);
             mView.showToast(R.string.message_no_internet);

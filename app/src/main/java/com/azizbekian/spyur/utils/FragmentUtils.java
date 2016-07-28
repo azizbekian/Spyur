@@ -200,6 +200,18 @@ public class FragmentUtils {
         add(activity, frameResId, fragment, false, null);
     }
 
+        /**
+     * Adds provided {@code fragment} to {@code frameResId} without adding to backstack.
+     *
+     * @param activity-   Hosting activity
+     * @param frameResId- Layout id where fragment should be placed
+     * @param fragment-   Fragment instance
+     * @param tag-        If true transaction would be added to back stack.
+     */
+    public static void add(FragmentActivity activity, @IdRes int frameResId, Fragment fragment, @Nullable String tag) {
+        add(activity, frameResId, fragment, false, tag);
+    }
+
     /**
      * Pops off the last fragment in the provided activity's stack.
      *

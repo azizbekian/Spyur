@@ -79,7 +79,6 @@ import rx.Subscription;
 public class ListingActivity extends RxBaseActivity implements ListingContract.View {
 
     private static final String TAG_YOUTUBE = "tag_youtube";
-    private static final int DURATION_SLIDE_PAGE_CHANGE = 4000;
 
     /**
      * @param activity                     The activity that launches {@link ListingActivity}
@@ -362,7 +361,8 @@ public class ListingActivity extends RxBaseActivity implements ListingContract.V
     @Override
     public void setupImagesAndVideo(List<String> imagesList, String videoId,
                                     @Nullable Transition transition,
-                                    YouTubePlayer.OnInitializedListener youtubeInitializedListener) {
+                                    YouTubePlayer.OnInitializedListener youtubeInitializedListener,
+                                    int sliderChangeDuration) {
 
         View imagesCard = null, videoCard = null;
         if (null != imagesList && imagesList.size() > 0) {
@@ -381,7 +381,7 @@ public class ListingActivity extends RxBaseActivity implements ListingContract.V
             }
             mSliderLayout.setPresetTransformer(SliderLayout.Transformer.Default);
             mSliderLayout.setPresetIndicator(SliderLayout.PresetIndicators.Center_Bottom);
-            mSliderLayout.setDuration(DURATION_SLIDE_PAGE_CHANGE);
+            mSliderLayout.setDuration(sliderChangeDuration);
             mSliderLayout.stopAutoCycle();
         }
 

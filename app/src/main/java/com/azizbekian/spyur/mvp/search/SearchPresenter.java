@@ -23,16 +23,13 @@ import com.azizbekian.spyur.adapter.SearchAdapter.ISearchItemClicked;
 import com.azizbekian.spyur.listener.IRecyclerLoadingListener;
 import com.azizbekian.spyur.model.SearchResponse;
 import com.azizbekian.spyur.model.SearchResponse.SearchItem;
+import com.azizbekian.spyur.mvp.SimplePresenter;
 import com.azizbekian.spyur.rest.SpyurApi;
 import com.azizbekian.spyur.utils.LogUtils;
 import com.azizbekian.spyur.utils.NetworkUtils;
 
 import java.util.List;
 
-import com.azizbekian.spyur.mvp.SimplePresenter;
-import com.azizbekian.spyur.utils.RxUtils;
-
-import rx.Subscriber;
 import rx.Subscription;
 
 /**
@@ -53,7 +50,7 @@ public class SearchPresenter extends SimplePresenter implements SearchContract.P
     private static final int THRESHOLD_LOAD_MORE = 10;
 
     @Nullable SearchContract.View mView;
-    @NonNull SearchContract.Model mModel = new SearchModel();
+    @NonNull SearchContract.Model mModel;
 
     private int mSearchPage = SpyurApi.SearchApi.INITIAL_SEARCH_PAGE - 1;
     private boolean mIsLoading;
@@ -69,6 +66,8 @@ public class SearchPresenter extends SimplePresenter implements SearchContract.P
 
     public SearchPresenter(@NonNull SearchContract.View view) {
         this.mView = view;
+
+        mModel = new SearchModel(this);
     }
 
     @Override public void create() {
@@ -106,58 +105,53 @@ public class SearchPresenter extends SimplePresenter implements SearchContract.P
         }
     }
 
+    @Override public void addSubscription(Subscription subscription) {
+        if (!verifyViewNotNull()) return;
+        mView.delegateAddSubscription(subscription);
+    }
+
+    @Override public void onDataSuccess(SearchResponse searchResponse) {
+        mIsLoading = false;
+
+        if (verifyViewNotNull()) mView.showProgress(false);
+
+        if (null != searchResponse) {
+            List<SearchResponse.SearchItem> data = searchResponse.getSearchItems();
+            mHasNextPage = searchResponse.hasNext();
+            if (!data.isEmpty()) {
+                ++mSearchPage;
+
+                if (verifyViewNotNull()) {
+                    if (mAdapter.isEmpty()) {
+                        mView.beginTransition(mTransition);
+                        mView.showResults(true);
+                        mAdapter.setData(data);
+                    } else mAdapter.addData(data);
+                    mAdapter.notifyDataSetChanged();
+                }
+            } else {
+                if (verifyViewNotNull()) {
+                    mView.showNoResultText(v -> {
+                        mView.setSearchViewQuery("", false);
+                        mView.searchViewFocus(true);
+                        mView.searchViewShowIme(true);
+                    }, getNoInternetString());
+                }
+            }
+        }
+    }
+
+    @Override public void onDataFailure(Throwable e) {
+        mIsLoading = false;
+        LogUtils.e("#125623 " + e.getMessage());
+    }
+
     @Override public void performSearch() {
         if (NetworkUtils.isConnected(SpyurApplication.getContext()) && verifyViewNotNull()) {
             if (mHasNextPage) {
                 mIsLoading = true;
-
-
-                Subscription s = mModel.search(mSearchPage + 1, mView.getQuery())
-                        .compose(RxUtils.applyIOtoMainThreadSchedulers())
-                        .subscribe(new Subscriber<SearchResponse>() {
-                            @Override public void onCompleted() {
-
-                            }
-
-                            @Override public void onError(Throwable e) {
-                                mIsLoading = false;
-                                LogUtils.e("#125623 " + e.getMessage());
-                            }
-
-                            @Override public void onNext(SearchResponse searchResponse) {
-
-                                mIsLoading = false;
-
-                                if (verifyViewNotNull()) mView.showProgress(false);
-
-                                if (null != searchResponse) {
-                                    List<SearchItem> data = searchResponse.getSearchItems();
-                                    mHasNextPage = searchResponse.hasNext();
-                                    if (!data.isEmpty()) {
-                                        ++mSearchPage;
-
-                                        if (verifyViewNotNull()) {
-                                            if (mAdapter.isEmpty()) {
-                                                mView.beginTransition(mTransition);
-                                                mView.showResults(true);
-                                                mAdapter.setData(data);
-                                            } else mAdapter.addData(data);
-                                            mAdapter.notifyDataSetChanged();
-                                        }
-                                    } else {
-                                        if (verifyViewNotNull()) {
-                                            mView.showNoResultText(v -> {
-                                                mView.setSearchViewQuery("", false);
-                                                mView.searchViewFocus(true);
-                                                mView.searchViewShowIme(true);
-                                            }, getNoInternetString());
-                                        }
-                                    }
-                                }
-                            }
-                        });
+                mModel.search(mSearchPage + 1, mView.getQuery());
                 mView.showProgress(true);
-                mView.delegateAddSubscription(s);
             }
         } else {
             if (verifyViewNotNull()) mView.showNoInternetMessage(true);
