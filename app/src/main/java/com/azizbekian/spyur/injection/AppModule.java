@@ -3,21 +3,18 @@ package com.azizbekian.spyur.injection;
 import android.content.Context;
 
 import com.azizbekian.spyur.api.ApiInteractor;
+import com.azizbekian.spyur.converter.ListingConverter;
+import com.azizbekian.spyur.converter.SearchConverter;
+import com.azizbekian.spyur.manager.SpyurManager;
+import com.azizbekian.spyur.rest.SpyurApi;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
 
 import javax.inject.Singleton;
 
-import com.azizbekian.spyur.BuildConfig;
-import com.azizbekian.spyur.manager.SpyurManager;
-import com.azizbekian.spyur.converter.ListingConverter;
-import com.azizbekian.spyur.converter.SearchConverter;
-import com.azizbekian.spyur.rest.SpyurApi;
-
 import dagger.Module;
 import dagger.Provides;
 import okhttp3.OkHttpClient;
-import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 
@@ -29,32 +26,15 @@ import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 @Module
 public class AppModule {
 
-    private Context context;
+    private Context mContext;
 
     public AppModule(Context context) {
-        this.context = context;
+        mContext = context;
     }
 
     @Provides @Singleton
-    public Context provideContext() {
-        return context;
-    }
-
-    @Provides @Singleton
-    public OkHttpClient provideOkHttpClient() {
-        OkHttpClient.Builder builder = new OkHttpClient.Builder();
-
-        if (BuildConfig.DEBUG) {
-            HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-            interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-            builder.addInterceptor(interceptor).addInterceptor(chain -> {
-                // Simulating network delay
-                // SystemClock.sleep(3000);
-                return chain.proceed(chain.request());
-            });
-        }
-
-        return builder.build();
+    public Context provideAppContext() {
+        return mContext;
     }
 
     @Provides @Singleton

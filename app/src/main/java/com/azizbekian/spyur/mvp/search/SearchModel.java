@@ -5,12 +5,8 @@ import android.support.annotation.NonNull;
 import com.azizbekian.spyur.SpyurApplication;
 import com.azizbekian.spyur.api.ApiInteractor;
 import com.azizbekian.spyur.model.SearchResponse;
-import com.azizbekian.spyur.utils.LogUtils;
 import com.azizbekian.spyur.utils.RxUtils;
 
-import java.util.List;
-
-import rx.Observable;
 import rx.Subscriber;
 
 /**

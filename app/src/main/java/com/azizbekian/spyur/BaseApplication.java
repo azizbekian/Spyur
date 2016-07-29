@@ -8,11 +8,11 @@ import com.azizbekian.spyur.injection.AppModule;
 import com.azizbekian.spyur.injection.DaggerAppComponent;
 
 /**
- * Created on May 09, 2016.
+ * Created by Joomag, Inc., on July 29, 2016.
  *
- * @author Andranik Azizbekian (andranik.azizbekyan@gmail.com)
+ * @author Andranik Azizbekian (a.azizbekyan@joomag.com)
  */
-public class SpyurApplication extends Application {
+public class BaseApplication extends Application {
 
     private static AppComponent sAppComponent;
 
@@ -32,5 +32,4 @@ public class SpyurApplication extends Application {
     public static Context getContext() {
         return sAppComponent.getApplicationContext();
     }
-
 }

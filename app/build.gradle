@@ -13,15 +13,30 @@ android {
         versionCode versions.versionCode
         versionName versions.versionName
     }
+    signingConfigs {
+        release {
+            storeFile file('E:\\android_app\\spyur.jks')
+            storePassword "test8888"
+            keyAlias "Andranik"
+            keyPassword "test8888"
+        }
+    }
     buildTypes {
+        debug {
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
     }
 }
 
@@ -65,5 +80,9 @@ dependencies {
     compile libraries.nineOldAndroids
     compile libraries.slider
     // END Slider
+
+    // Development
+    debugCompile libraries.stetho
+    debugCompile libraries.stethoOkHttp
 
 }

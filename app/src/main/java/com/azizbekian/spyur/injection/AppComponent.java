@@ -18,7 +18,7 @@ import dagger.Component;
  */
 
 @Singleton
-@Component(modules = {AppModule.class})
+@Component(modules = {AppModule.class, BuildTypeModule.class})
 public interface AppComponent {
 
     /**
