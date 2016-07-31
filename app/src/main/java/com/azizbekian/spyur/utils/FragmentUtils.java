@@ -12,11 +12,9 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 
 /**
- * Utility class for fragment transactions.
- * <p>
- * Created by Joomag, Inc., on June 16, 2016.
+ * Created on June 16, 2016.
  *
- * @author Andranik Azizbekian (a.azizbekyan@joomag.com)
+ * @author Andranik Azizbekian (andranik.azizbekyan@gmail.com)
  */
 @SuppressWarnings("unused")
 public class FragmentUtils {

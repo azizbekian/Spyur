@@ -12,9 +12,9 @@ import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 
 /**
- * Created by Joomag, Inc., on July 29, 2016.
+ * Created on July 29 2016.
  *
- * @author Andranik Azizbekian (a.azizbekyan@joomag.com)
+ * @author Andranik Azizbekian (andranik.azizbekyan@gmail.com)
  */
 @Module
 public class BuildTypeModule {

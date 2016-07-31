@@ -22,7 +22,3 @@
   **[] $VALUES;
   public *;
 }
-
--keepattributes InnerClasses
--keepattributes EnclosingMethod
--dontoptimize

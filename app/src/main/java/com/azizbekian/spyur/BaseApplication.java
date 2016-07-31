@@ -1,18 +1,18 @@
 package com.azizbekian.spyur;
 
-import android.app.Application;
 import android.content.Context;
+import android.support.multidex.MultiDexApplication;
 
 import com.azizbekian.spyur.injection.AppComponent;
 import com.azizbekian.spyur.injection.AppModule;
 import com.azizbekian.spyur.injection.DaggerAppComponent;
 
 /**
- * Created by Joomag, Inc., on July 29, 2016.
+ * Created on July 29, 2016.
  *
- * @author Andranik Azizbekian (a.azizbekyan@joomag.com)
+ * @author Andranik Azizbekian (andranik.azizbekyan@gmail.com)
  */
-public class BaseApplication extends Application {
+public class BaseApplication extends MultiDexApplication {
 
     private static AppComponent sAppComponent;
 

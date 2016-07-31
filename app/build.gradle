@@ -12,13 +12,14 @@ android {
         targetSdkVersion versions.targetSdk
         versionCode versions.versionCode
         versionName versions.versionName
+        multiDexEnabled true
     }
     signingConfigs {
         release {
-            storeFile file('E:\\android_app\\spyur.jks')
-            storePassword "test8888"
-            keyAlias "Andranik"
-            keyPassword "test8888"
+            storeFile file(credentials.storeFile)
+            storePassword credentials.storePassword
+            keyAlias credentials.keyAlias
+            keyPassword credentials.keyPassword
         }
     }
     buildTypes {
@@ -74,6 +75,7 @@ dependencies {
     compile libraries.javaxAnnotation
     compile libraries.jsoup
     compile files(libraries.youtube)
+    compile libraries.multidex
 
     // START Slider
     compile libraries.picasso
