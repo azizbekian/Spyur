@@ -1,22 +1,27 @@
 <resources>
-    <string name="app_name">Spyur</string>
+    <string name="app_name" translatable="false">Spyur</string>
 
-    <string name="message.no_info_for_listing">No information provided</string>
-    <string name="message.no_results">No results.</string>
-    <string name="message.no_search_results">No results for\n“%1$s”</string>
+    <string name="message.no_info_for_listing" translatable="false">No information provided</string>
+    <string name="message.no_results" translatable="false">No results.</string>
+    <string name="message.no_search_results" translatable="false">No results for\n“%1$s”</string>
 
-    <string name="error.youtube">Error opening video. Try later</string>
-
-    <string name="description.search_magnifier">Search magnifier</string>
-    <string name="description.mLogo">Logo</string>
+    <string name="error.youtube" translatable="false">Error opening video. Try later</string>
 
     <!--    Permissions    -->
-    <string name="permission.rationale_location">Access to the location service is required to show your current location.</string>
-    <string name="permission.location_denied">You have not provided location permission, thus your current location would not be shown on the map.\nIf the permission has been permanently denied, it can be enabled from the System Settings &gt; Apps &gt; \'Spyur\'.</string>
-    <string name="permission.required_toast">Location permission is required for this demo.</string>
+    <string name="permission.rationale_location" translatable="false">Access to the location service
+        is required to show your current location.
+    </string>
+    <string name="permission.location_denied" translatable="false">You have not provided location
+        permission, thus your current location would not be shown on the map.\nIf the permission has
+        been permanently denied, it can be enabled from the System Settings &gt; Apps &gt;
+        \'Spyur\'.
+    </string>
+    <string name="permission.required_toast" translatable="false">Location permission is required
+        for this demo.
+    </string>
 
     <string name="transition.logo" translatable="false">transition_logo</string>
-     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">
         AIzaSyBzULTbCdnDTqIs5UXqA3QTj5AU2hC5ZLQ
     </string>
 

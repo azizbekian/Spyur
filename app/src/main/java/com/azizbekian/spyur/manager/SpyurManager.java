@@ -15,6 +15,7 @@ import com.azizbekian.spyur.model.SearchResponse;
 import com.azizbekian.spyur.rest.SpyurApi;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import retrofit2.Call;
 import rx.Observable;
@@ -30,7 +31,6 @@ public class SpyurManager implements ApiInteractor {
     private SpyurApi.ListingApi mListingApi;
     private @LanguageType String mLang;
 
-    @Inject
     public SpyurManager(SpyurApi.SearchApi searchApi, SpyurApi.ListingApi listingApi) {
 
         mSearchApi = searchApi;

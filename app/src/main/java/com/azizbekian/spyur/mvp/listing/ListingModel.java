@@ -5,12 +5,9 @@ import android.support.annotation.NonNull;
 import com.azizbekian.spyur.SpyurApplication;
 import com.azizbekian.spyur.api.ApiInteractor;
 import com.azizbekian.spyur.model.ListingResponse;
-import com.azizbekian.spyur.utils.LogUtils;
 import com.azizbekian.spyur.utils.RxUtils;
 
 import rx.Subscriber;
-
-import static com.azizbekian.spyur.listener.AppBarStateChangeListener.EXPANDED;
 
 /**
  * Created on Jul 17, 2016.

@@ -3,9 +3,9 @@ package com.azizbekian.spyur.utils;
 import com.azizbekian.spyur.BuildConfig;
 
 /**
- * Created by Joomag, Inc., on June 16, 2016.
+ * Created on June 16, 2016.
  *
- * @author Andranik Azizbekian (a.azizbekyan@joomag.com)
+ * @author Andranik Azizbekian (andranik.azizbekyan@gmail.com)
  */
 public class ExceptionUtils {
 

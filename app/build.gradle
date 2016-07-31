@@ -12,16 +12,32 @@ android {
         targetSdkVersion versions.targetSdk
         versionCode versions.versionCode
         versionName versions.versionName
+        multiDexEnabled true
+    }
+    signingConfigs {
+        release {
+            storeFile file(credentials.storeFile)
+            storePassword credentials.storePassword
+            keyAlias credentials.keyAlias
+            keyPassword credentials.keyPassword
+        }
     }
     buildTypes {
+        debug {
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
     }
 }
 
@@ -59,11 +75,16 @@ dependencies {
     compile libraries.javaxAnnotation
     compile libraries.jsoup
     compile files(libraries.youtube)
+    compile libraries.multidex
 
     // START Slider
     compile libraries.picasso
     compile libraries.nineOldAndroids
     compile libraries.slider
     // END Slider
+
+    // Development
+    debugCompile libraries.stetho
+    debugCompile libraries.stethoOkHttp
 
 }

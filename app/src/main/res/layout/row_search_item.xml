@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/card_view"
-    style="@style/SearchCard">
+                                    xmlns:tools="http://schemas.android.com/tools"
+                                    android:id="@+id/card_view"
+                                    style="@style/SearchCard">
 
     <com.azizbekian.spyur.widget.ForegroundRelativeLayout
         android:id="@+id/search_container"
@@ -17,7 +17,7 @@
             android:id="@+id/logo"
             android:layout_width="@dimen/logo_width_small"
             android:layout_height="@dimen/logo_height_small"
-            android:contentDescription="@string/description.mLogo" />
+            tools:ignore="ContentDescription"/>
 
         <TextView
             android:id="@+id/title"
@@ -30,7 +30,7 @@
             android:ellipsize="end"
             android:maxLines="3"
             android:textAppearance="@style/Text.SearchRow"
-            tools:text="Example Text" />
+            tools:text="Example Text"/>
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -44,7 +44,7 @@
                 android:layout_height="@dimen/logo_height_tiny"
                 android:contentDescription="@null"
                 android:src="@drawable/ic_crop_original_black_24dp"
-                android:visibility="visible" />
+                android:visibility="visible"/>
 
             <ImageView
                 android:id="@+id/video"
@@ -53,7 +53,7 @@
                 android:layout_marginStart="@dimen/spacing_normal"
                 android:contentDescription="@null"
                 android:src="@drawable/ic_movie_black_24dp"
-                android:visibility="visible" />
+                android:visibility="visible"/>
 
         </LinearLayout>
     </com.azizbekian.spyur.widget.ForegroundRelativeLayout>
