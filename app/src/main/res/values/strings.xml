@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name" translatable="false">Spyur</string>
+    <string name="app_name" translatable="false">Yellow pages</string>
 
     <string name="message.no_info_for_listing" translatable="false">No information provided</string>
     <string name="message.no_results" translatable="false">No results.</string>
@@ -22,7 +22,7 @@
 
     <string name="transition.logo" translatable="false">transition_logo</string>
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">
-        AIzaSyBzULTbCdnDTqIs5UXqA3QTj5AU2hC5ZLQ
+        AIzaSyC_CufsfBTE7F5BV3Iz2Vgyca-gT49nvwQ
     </string>
 
 </resources>

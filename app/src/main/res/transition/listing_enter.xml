@@ -5,13 +5,13 @@
 
     <slide android:slideEdge="top">
         <targets>
-            <target android:targetId="@id/app_bar_layout" />
+            <target android:targetId="@id/appbarLayout" />
         </targets>
     </slide>
 
     <slide android:slideEdge="bottom">
         <targets>
-            <target android:targetId="@id/listing_content_card" />
+            <target android:targetId="@id/contentCard" />
         </targets>
     </slide>
 

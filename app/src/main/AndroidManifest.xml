@@ -1,51 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.azizbekian.spyur">
+          xmlns:tools="http://schemas.android.com/tools"
+          package="com.incentive.yellowpages">
 
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
-        android:name=".SpyurApplication"
+        android:name=".ui.Application"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Spyur">
-
-        <activity
-            android:name=".activity.SearchActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="sensorPortrait"
-            android:theme="@style/Spyur.Splash">
+        android:theme="@style/AppTheme"
+        tools:ignore="AllowBackup,GoogleAppIndexingWarning">
+        <activity android:name=".ui.main.MainActivity"
+            android:theme="@style/AppTheme.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH"/>
-            </intent-filter>
-            <intent-filter>
-                <action android:name="com.google.android.gms.actions.SEARCH_ACTION"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-            </intent-filter>
-
-            <meta-data
-                android:name="android.app.searchable"
-                android:resource="@xml/searchable"/>
         </activity>
 
-        <activity
-            android:name=".activity.ListingActivity"
-            android:screenOrientation="sensorPortrait"
-            android:theme="@style/Spyur.Listing"/>
-
-        <activity
-            android:name=".activity.MapActivity"
-            android:theme="@style/Spyur.Map"/>
+        <activity android:name=".ui.detail.DetailActivity"
+                  android:theme="@style/AppTheme.BaseDetail.Detail"/>
+        <activity android:name=".ui.detail.maps.MapsActivity"
+                  android:theme="@style/AppTheme.BaseDetail.Detail"/>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

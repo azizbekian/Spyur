@@ -1,18 +1,18 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="SearchWindowAnimations">
         <item name="android:windowEnterAnimation">@null</item>
         <item name="android:windowExitAnimation">@anim/fade_out_rapidly</item>
     </style>
 
-    <style name="SearchViewTheme" parent="SpyurDarkOverlay">
+    <style name="SearchViewTheme" parent="AppDarkOverlay">
         <item name="colorControlActivated">?android:colorAccent</item>
         <item name="android:searchViewStyle">@style/Widget.Spyur.SearchView</item>
     </style>
 
     <style name="Widget.Spyur.SearchView" parent="android:style/Widget.Material.SearchView">
         <item name="android:searchIcon">@null</item>
-        <item name="android:searchHintIcon">@null</item>
+        <item name="android:searchHintIcon" tools:ignore="NewApi">@null</item>
         <item name="android:queryBackground">@android:color/transparent</item>
         <item name="android:submitBackground">@android:color/transparent</item>
     </style>
@@ -25,13 +25,14 @@
         </item>
         <item name="android:background">?android:colorPrimary</item>
         <item name="android:elevation">@dimen/z_app_bar</item>
-        <item name="android:theme">@style/SpyurDarkOverlay</item>
+        <item name="android:theme">@style/AppDarkOverlay</item>
         <item name="android:layout_height">?android:actionBarSize</item>
     </style>
 
     <style name="Widget.Spyur.HomeToolbar" parent="Widget.Spyur.Toolbar"/>
 
-    <style name="TextAppearance.ToolbarTitleSmallCaps" parent="@android:style/TextAppearance.Material.Widget.ActionBar.Title">
+    <style name="TextAppearance.ToolbarTitleSmallCaps"
+           parent="@android:style/TextAppearance.Material.Widget.ActionBar.Title">
         <item name="android:textColor">@color/purpleA200</item>
         <item name="android:fontFeatureSettings">smcp</item>
         <item name="android:letterSpacing">0.2</item>
@@ -42,7 +43,8 @@
         <item name="android:textColor">@color/text_primary_light</item>
     </style>
 
-    <style name="TextAppearance.DialogContent" parent="@android:style/TextAppearance.Material.Subhead">
+    <style name="TextAppearance.DialogContent"
+           parent="@android:style/TextAppearance.Material.Subhead">
         <item name="android:textColor">@color/text_secondary_dark</item>
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:letterSpacing">0.01</item>
@@ -98,6 +100,8 @@
     <style name="CardContent.Listing">
         <item name="android:paddingTop">@dimen/card_padding</item>
         <item name="android:paddingBottom">@dimen/card_padding</item>
+        <item name="android:layout_marginStart">@dimen/spacing_small</item>
+        <item name="android:layout_marginTop">@dimen/spacing_tiny</item>
     </style>
 
     <style name="Text" parent="@android:style/TextAppearance.Material"/>

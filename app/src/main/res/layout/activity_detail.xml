@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/detailRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context=".ui.detail.DetailActivity">
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true"
+        android:theme="@style/AppBarLayout.Listing">
+
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/collapsingToolbarLayout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/listing_header_height"
+            android:clipToPadding="false"
+            android:fitsSystemWindows="true"
+            app:contentScrim="?attr/colorPrimary"
+            app:expandedTitleMarginEnd="@dimen/ctl_expand_end"
+            app:expandedTitleMarginStart="@dimen/ctl_expand_start"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
+
+            <FrameLayout
+                android:id="@+id/headerFrameLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fitsSystemWindows="true">
+
+                <ImageView
+                    android:id="@+id/headerBackgroundImageView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="@null"
+                    android:visibility="gone"/>
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_marginBottom="@dimen/spacing_big"
+                    android:layout_marginEnd="@dimen/spacing_normal"
+                    android:layout_marginStart="@dimen/listing_header_margin">
+
+                    <android.support.v7.widget.CardView
+                        android:id="@+id/logoCard"
+                        style="@style/LogoCard"
+                        card_view:cardBackgroundColor="@android:color/white">
+
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:padding="@dimen/spacing_tiny">
+
+                            <ImageView
+                                android:id="@+id/logoBgImageView"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_gravity="center"
+                                android:background="@android:color/transparent"
+                                android:contentDescription="@null"
+                                android:transitionName="@string/transition.logo"/>
+                        </FrameLayout>
+                    </android.support.v7.widget.CardView>
+
+                    <TextView
+                        android:id="@+id/headerTitle"
+                        style="@style/Text.Title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBottom="@id/logoCard"
+                        android:layout_alignTop="@id/logoCard"
+                        android:layout_centerVertical="true"
+                        android:layout_toEndOf="@id/logoCard"
+                        android:ellipsize="end"
+                        android:gravity="center_vertical"
+                        android:maxLines="3"
+                        android:paddingEnd="0dp"
+                        android:paddingStart="@dimen/spacing_smaller"
+                        tools:ignore="symmetry"
+                        tools:text="Company name"/>
+                </RelativeLayout>
+
+                <ImageView
+                    android:id="@+id/mapLogoImageView"
+                    android:layout_width="@dimen/logo_map_width"
+                    android:layout_height="@dimen/logo_map_height"
+                    android:layout_gravity="end"
+                    android:layout_marginEnd="@dimen/spacing_larger"
+                    android:layout_marginTop="@dimen/logo_map_margin_top"
+                    android:background="?android:selectableItemBackground"
+                    android:contentDescription="@null"
+                    android:src="@drawable/map"
+                    android:visibility="gone"
+                    tools:visibility="visible"/>
+            </FrameLayout>
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@android:color/transparent"
+                app:layout_collapseMode="pin"
+                app:popupTheme="@style/ToolbarPopup.Listing">
+
+                <ImageButton
+                    android:id="@+id/backImageButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/mid_grey_ripple"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_arrow_back"/>
+
+            </android.support.v7.widget.Toolbar>
+        </android.support.design.widget.CollapsingToolbarLayout>
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="@dimen/listing_padding_bottom"
+        app:behavior_overlapTop="@dimen/spacing_larger"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/contentCard"
+            style="@style/ListingCard.MainInfo">
+
+            <include
+                layout="@layout/card_listing"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <FrameLayout
+                android:id="@+id/progressBarWrapper"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/card_placeholder_height"
+                android:visibility="gone">
+
+                <ProgressBar
+                    android:id="@+id/listingContentProgress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"/>
+            </FrameLayout>
+
+            <ViewStub
+                android:id="@+id/emptyListingViewStub"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/card_placeholder_height"
+                android:layout="@layout/viewstub_empty_listing"/>
+        </android.support.v7.widget.CardView>
+
+    </android.support.v4.widget.NestedScrollView>
+</android.support.design.widget.CoordinatorLayout>
