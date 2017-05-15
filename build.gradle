@@ -11,20 +11,46 @@ buildscript {
     }
     dependencies {
         classpath "com.android.tools.build:gradle:$versions.gradle"
-        classpath "com.neenbedankt.gradle.plugins:android-apt:$versions.apt"
-        classpath "me.tatarka:gradle-retrolambda:$versions.retrolambda"
-
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlinVersion"
     }
 }
 
 allprojects {
     repositories {
         jcenter()
+        maven {
+            url 'https://oss.sonatype.org/content/repositories/snapshots/'
+        }
     }
 }
 
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.3'
+}
+
+// PREDEX SETUP START
+// https://gist.github.com/artem-zinnatullin/28ac8ea1494825832f23
+project.ext {
+    if (project.hasProperty('preDexEnable')) {
+        project.ext.preDexLibs = project.properties['preDexEnable'].equals('true')
+    } else {
+        project.ext.preDexLibs = true // pre dexing should be true by default
+    }
+
+    println('PREDEX ' + (project.ext.preDexLibs ? 'ENABLED' : 'DISABLED')) // goes to build log or console output
+}
+
+subprojects {
+    project.plugins.whenPluginAdded { plugin ->
+        if ("com.android.build.gradle.AppPlugin".equals(plugin.class.name)) {
+            project.android.dexOptions.preDexLibraries = rootProject.ext.preDexLibs
+        } else if ("com.android.build.gradle.LibraryPlugin".equals(plugin.class.name)) {
+            project.android.dexOptions.preDexLibraries = rootProject.ext.preDexLibs
+        }
+    }
+}
+// PREDEX SETUP END

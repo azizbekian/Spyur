@@ -2,7 +2,7 @@
 <fade xmlns:android="http://schemas.android.com/apk/res/android">
 
     <targets>
-        <target android:excludeId="@id/search_toolbar" />
+        <target android:excludeId="@id/searchToolbar"/>
     </targets>
 
 </fade>

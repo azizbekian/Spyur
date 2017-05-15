@@ -1,11 +1,11 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.neenbedankt.android-apt'
-apply plugin: 'me.tatarka.retrolambda'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion versions.compileSdk
     buildToolsVersion versions.buildTools
-
     defaultConfig {
         applicationId versions.applicationId
         minSdkVersion versions.minSdk
@@ -13,6 +13,7 @@ android {
         versionCode versions.versionCode
         versionName versions.versionName
         multiDexEnabled true
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
         release {
@@ -24,21 +25,30 @@ android {
     }
     buildTypes {
         debug {
+            minifyEnabled false
+            debuggable true
         }
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
         }
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
     }
     lintOptions {
         checkReleaseBuilds false
         abortOnError false
     }
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+    packagingOptions {
+        // caused by RxBinding which has a dependency of RxJava 1
+        exclude 'META-INF/rxjava.properties'
+    }
+}
+
+kapt {
+    generateStubs = true
 }
 
 dependencies {
@@ -48,16 +58,17 @@ dependencies {
     compile libraries.supportV4
     compile libraries.supportDesign
     compile libraries.palette
-    compile libraries.recyclerview
     compile libraries.cardview
     compile libraries.playServicesMaps
+    compile libraries.playServicesLocation
     compile libraries.dagger
-    compile libraries.daggerCompiler
+    kapt libraries.daggerCompiler
 
     // Square
     compile libraries.retrofit
     compile libraries.retrofitRxJava
-    compile libraries.okhttpInterceptor
+    compile libraries.okHttp
+    compile libraries.okHttpInterceptor
 
     // Rx
     compile libraries.rxJava
@@ -65,26 +76,17 @@ dependencies {
 
     // Jake Wharton
     compile libraries.rxBinding
-    compile libraries.rxBindingV4
-    compile libraries.rxBindingV7
-    compile libraries.butterknife
-    apt libraries.butterknifeCompiler
+    compile libraries.timber
 
     // Misc
+    compile libraries.kotlin
     compile libraries.glide
-    compile libraries.javaxAnnotation
     compile libraries.jsoup
-    compile files(libraries.youtube)
     compile libraries.multidex
+    kapt libraries.kotlinDataBinding
+    provided libraries.javax // needed for dagger
 
-    // START Slider
-    compile libraries.picasso
-    compile libraries.nineOldAndroids
-    compile libraries.slider
-    // END Slider
-
-    // Development
+    // Debug
     debugCompile libraries.stetho
     debugCompile libraries.stethoOkHttp
-
 }

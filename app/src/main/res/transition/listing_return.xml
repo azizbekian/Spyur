@@ -5,7 +5,7 @@
 
     <slide android:slideEdge="top">
         <targets>
-            <target android:targetId="@id/app_bar_layout" />
+            <target android:targetId="@id/appbarLayout" />
         </targets>
     </slide>
 
