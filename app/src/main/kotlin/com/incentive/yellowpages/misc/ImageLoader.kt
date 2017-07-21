@@ -32,14 +32,14 @@ class ImageLoader @Inject constructor(@ApplicationContext context: Context) {
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                 .priority(Priority.IMMEDIATE)
                 .listener(object : RequestListener<String, Bitmap> {
-                    override fun onException(e: Exception?, model: String?,
+                    override fun onException(e: Exception, model: String?,
                                              target: Target<Bitmap>?,
                                              isFirstResource: Boolean): Boolean {
                         onImageFailure?.accept(e)
                         return false
                     }
 
-                    override fun onResourceReady(resource: Bitmap?, model: String?,
+                    override fun onResourceReady(resource: Bitmap, model: String?,
                                                  target: Target<Bitmap>?,
                                                  isFromMemoryCache: Boolean,
                                                  isFirstResource: Boolean): Boolean {
